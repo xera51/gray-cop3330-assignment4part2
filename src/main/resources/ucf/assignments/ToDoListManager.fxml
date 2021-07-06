@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ucf.assignments.ToDoListManagerController">
+   <left>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <top>
+            <Label fx:id="toDoListsLabel" text="To-Do Lists" BorderPane.alignment="CENTER" />
+         </top>
+         <center>
+            <ListView fx:id="toDoListsListView" prefHeight="300.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+         </center>
+         <bottom>
+            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="addListButton" mnemonicParsing="false" onAction="#addList" text="Add List" />
+                  <Button fx:id="saveAllListsButton" mnemonicParsing="false" onAction="#saveAllLists" text="Save All Lists" />
+               </children>
+            </HBox>
+         </bottom>
+      </BorderPane>
+   </left>
+   <center>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <top>
+            <HBox prefHeight="58.0" prefWidth="250.0" BorderPane.alignment="CENTER">
+               <children>
+                  <RadioButton fx:id="allRadioButton" mnemonicParsing="false" text="All">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="filterToggleGroup" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="completeRadioButton" mnemonicParsing="false" text="Complete" toggleGroup="$filterToggleGroup" />
+                  <RadioButton fx:id="incompleteRadioButton" mnemonicParsing="false" text="Incomplete" toggleGroup="$filterToggleGroup" />
+               </children>
+            </HBox>
+         </top>
+         <bottom>
+            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="addItemButton" mnemonicParsing="false" onAction="#addItem" text="Add Item" />
+                  <Button fx:id="saveListButton" mnemonicParsing="false" onAction="#saveList" text="Save List" />
+               </children>
+            </HBox>
+         </bottom>
+         <center>
+            <ListView fx:id="toDoListListView" prefHeight="300.0" prefWidth="206.0" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </center>
+   <right>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <bottom>
+            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="deleteItemButton" mnemonicParsing="false" onAction="#deleteItem" text="Delete Item" />
+               </children>
+            </HBox>
+         </bottom>
+         <center>
+            <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <bottom>
+                  <CheckBox fx:id="completeCheckbox" mnemonicParsing="false" onAction="#toggleComplete" text="Complete?" BorderPane.alignment="CENTER" />
+               </bottom>
+               <top>
+                  <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label fx:id="dueLabel" text="Due" />
+                        <TextField fx:id="dueDateField" onInputMethodTextChanged="#dueEdited" prefHeight="26.0" prefWidth="159.0" />
+                        <Button fx:id="editDueButton" mnemonicParsing="false" onAction="#editDue" />
+                     </children>
+                  </HBox>
+               </top>
+               <center>
+                  <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label fx:id="descriptionLabel" text="Description" />
+                              <Button fx:id="editDescButton" mnemonicParsing="false" onAction="#editDesc" />
+                           </children>
+                        </HBox>
+                        <TextArea fx:id="descriptionField" onInputMethodTextChanged="#descEdited" prefHeight="174.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </center>
+            </BorderPane>
+         </center>
+         <top>
+            <VBox prefHeight="100.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="listTitleField" onInputMethodTextChanged="#listTitleEdited" />
+                        <Button fx:id="editListButton" mnemonicParsing="false" onAction="#editList" />
+                     </children>
+                  </HBox>
+                  <Button fx:id="deleteListButton" mnemonicParsing="false" onAction="#deleteList" text="Delete List" />
+               </children>
+            </VBox>
+         </top>
+      </BorderPane>
+   </right>
+</BorderPane>
