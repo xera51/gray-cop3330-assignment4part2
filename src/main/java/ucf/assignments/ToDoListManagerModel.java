@@ -5,26 +5,57 @@
 
 package ucf.assignments;
 
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.io.*;
+import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.util.Collection;
 
-// Unsure of how I want to store data
-// Might be either one json file, one json file per list, or one csv file, or a database
 public class ToDoListManagerModel {
+    ObservableList<Item> toDoList = FXCollections.observableArrayList();
 
-    ObservableList<ToDoList> toDoListObservableList = FXCollections.observableArrayList();
+    private File listFile;
 
-    void loadData() {
-        // load data into toDoListObservableList
+
+    void open(File listFile) throws JsonSyntaxException {
+        try(BufferedReader reader = new BufferedReader(new FileReader(listFile))) {
+            if(listFile.length() != 0) {
+                toDoList.addAll(ToDoListSerializer
+                        .fromJson(reader));
+            }
+            this.listFile = listFile;
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
-    void saveToDoList(String listName) {
-        // find the list
-        // update the list (unsure of method of storage, read comment near top)
+    void close() {
+        toDoList.clear();
+        listFile = null;
     }
 
-    void saveAllDoToLists() {
-        // update external storage (unsure of method of storage, read comment near top)
+    void save() {
+        if(listFile != null) {
+            try(BufferedWriter writer = new BufferedWriter(new FileWriter(listFile))) {
+                writer.write(ToDoListSerializer.toJson(toDoList));
+            } catch (IOException e) { e.printStackTrace(); }
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    void delete() {
+        toDoList.clear();
+        if(listFile != null) listFile.delete();
+    }
+
+    public File getListFile() {
+        return listFile;
+    }
+
+    public void setListFile(File listFile) {
+        this.listFile = listFile;
     }
 }
