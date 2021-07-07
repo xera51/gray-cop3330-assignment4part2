@@ -1,66 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ucf.assignments.ToDoListManagerController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" stylesheets="@ToDoListManager.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ucf.assignments.ToDoListManagerController">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="_File">
+            <items>
+                  <MenuItem mnemonicParsing="false" text="New List">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem mnemonicParsing="false" text="Open...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+              <MenuItem mnemonicParsing="false" text="Close List" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Save">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem mnemonicParsing="false" text="Save As..." />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Exit">
+                     <accelerator>
+                        <KeyCodeCombination alt="DOWN" code="F4" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="_Edit">
+            <items>
+                  <MenuItem mnemonicParsing="false" text="Add Item" />
+              <MenuItem mnemonicParsing="false" text="Delete Item">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="DELETE" control="UP" meta="ANY" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem mnemonicParsing="false" text="Clear All Items">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="DELETE" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="_View">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Show All Items" />
+                  <MenuItem mnemonicParsing="false" text="Show Incomplete Items" />
+                  <MenuItem mnemonicParsing="false" text="Show Complete Items" />
+              </items>
+            </Menu>
+          <Menu mnemonicParsing="false" text="_Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Getting Started" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
    <left>
-      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <BorderPane prefHeight="200.0" prefWidth="250.0" styleClass="borderpane" BorderPane.alignment="CENTER">
          <top>
-            <Label fx:id="toDoListsLabel" text="To-Do Lists" BorderPane.alignment="CENTER" />
+            <HBox alignment="BOTTOM_CENTER" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <MenuButton mnemonicParsing="false" prefHeight="26.0" text="Show">
+                    <items>
+                        <RadioMenuItem mnemonicParsing="false" text="Incomplete" />
+                        <RadioMenuItem mnemonicParsing="false" text="Complete" />
+                    </items>
+                  </MenuButton>
+                  <MenuButton mnemonicParsing="false" prefHeight="26.0" text="Sort">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Alphabetically" />
+                      <MenuItem mnemonicParsing="false" text="Due Date" />
+                    </items>
+                  </MenuButton>
+                  <Button mnemonicParsing="false" text="+" />
+                  <Button mnemonicParsing="false" text="-" />
+               </children>
+               <BorderPane.margin>
+                  <Insets top="6.0" />
+               </BorderPane.margin>
+            </HBox>
          </top>
          <center>
-            <ListView fx:id="toDoListsListView" prefHeight="300.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+            <ListView fx:id="itemListView" BorderPane.alignment="CENTER" />
          </center>
-         <bottom>
-            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Button fx:id="addListButton" mnemonicParsing="false" onAction="#addList" text="Add List" />
-                  <Button fx:id="saveAllListsButton" mnemonicParsing="false" onAction="#saveAllLists" text="Save All Lists" />
-               </children>
-            </HBox>
-         </bottom>
       </BorderPane>
    </left>
    <center>
-      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <top>
-            <HBox prefHeight="58.0" prefWidth="250.0" BorderPane.alignment="CENTER">
-               <children>
-                  <RadioButton fx:id="allRadioButton" mnemonicParsing="false" text="All">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="filterToggleGroup" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton fx:id="completeRadioButton" mnemonicParsing="false" text="Complete" toggleGroup="$filterToggleGroup" />
-                  <RadioButton fx:id="incompleteRadioButton" mnemonicParsing="false" text="Incomplete" toggleGroup="$filterToggleGroup" />
-               </children>
-            </HBox>
-         </top>
-         <bottom>
-            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Button fx:id="addItemButton" mnemonicParsing="false" onAction="#addItem" text="Add Item" />
-                  <Button fx:id="saveListButton" mnemonicParsing="false" onAction="#saveList" text="Save List" />
-               </children>
-            </HBox>
-         </bottom>
-         <center>
-            <ListView fx:id="toDoListListView" prefHeight="300.0" prefWidth="206.0" BorderPane.alignment="CENTER" />
-         </center>
-      </BorderPane>
-   </center>
-   <right>
       <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <bottom>
             <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -112,5 +162,5 @@
             </VBox>
          </top>
       </BorderPane>
-   </right>
+   </center>
 </BorderPane>

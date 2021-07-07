@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 // TODO make icon a variable so other windows can access
 public class ToDoListManager extends Application {
@@ -19,6 +20,7 @@ public class ToDoListManager extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("ToDoListManager.fxml"));
         Scene scene = new Scene(root);
+
         primaryStage.setTitle("To-Do List Manager");
         primaryStage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("Icon.png")));
         primaryStage.setScene(scene);

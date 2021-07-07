@@ -1,1 +1,4 @@
-/* TODO: styling */
+.borderpane {
+    -fx-padding: 6;
+    /*-fx-background-color: darkgrey;*/
+}
