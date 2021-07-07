@@ -11,69 +11,25 @@ import java.time.LocalDate;
 
 public class Item {
 
+    private StringProperty description = new SimpleStringProperty("");
+    private ObjectProperty<LocalDate> dueDate = new SimpleObjectProperty<>(LocalDate.now());
+    private BooleanProperty complete = new SimpleBooleanProperty(false);
 
-    private StringProperty description = new SimpleStringProperty();
-    private ObjectProperty<LocalDate> dueDate = new ObjectPropertyBase<LocalDate>() {
-        @Override
-        public Object getBean() {
-            return null;
-        }
-
-        @Override
-        public String getName() {
-            return null;
-        }
-    };
-    private BooleanProperty complete = new SimpleBooleanProperty();
-
-    public Item() {
-        //constructs Item, complete set to false
-    }
-
+    public Item() {}
     public Item(String description, LocalDate dueDate) {
-        //constructs Item, complete set to false
+        this.setDesc(description);
+        this.setDueDate(dueDate);
     }
 
+    public String getDesc() { return this.description.get(); }
+    public LocalDate getDueDate() { return this.dueDate.get(); }
+    public boolean isComplete() { return this.complete.get(); }
 
-    public String getDesc() {
-        //return Item description string
-        return null;
-    }
+    public void setDesc(String description) { this.description.set(description); }
+    public void setDueDate(LocalDate dueDate) { this.dueDate.set(dueDate); }
+    public void setComplete(boolean complete) { this.complete.set(complete); }
 
-    public LocalDate getDueDate() {
-        //return Item dueDate
-        return null;
-    }
-
-    public boolean isComplete() {
-        // returns Item complete status
-        return false;
-    }
-
-    public void setDesc(String description) {
-        //set Item description
-    }
-
-    public void setDueDate(LocalDate dueDate) {
-        //set Item dueDate
-    }
-
-    public void setComplete(boolean complete) {
-        // sets Item compelete
-    }
-
-    public StringProperty descriptionProperty() {
-        // returns description
-        return null;
-    }
-
-    public ObjectProperty<LocalDate> dueDateProperty() {
-        // returns local date
-        return null;
-    }
-
-    public BooleanProperty completeProperty() {
-        // returns complete
-        return null;
-    }
+    public StringProperty descriptionProperty() { return this.description; }
+    public ObjectProperty<LocalDate> dueDateProperty() { return this.dueDate; }
+    public BooleanProperty completeProperty() { return this.complete; }
 }
