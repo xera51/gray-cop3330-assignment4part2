@@ -3,7 +3,7 @@
  *  Copyright 2021 Christopher Gray
  */
 
-package ucf.assignments;
+package ucf.assignments.model;
 
 import javafx.beans.Observable;
 import javafx.beans.property.*;
@@ -12,31 +12,31 @@ import javafx.util.Callback;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Task implements Serializable, Comparable<Task> {
+public class ToDo implements Serializable, Comparable<ToDo> {
 
     private final StringProperty description;
     private final ObjectProperty<LocalDate> dueDate;
     private final BooleanProperty complete;
 
-    public Task() {
+    public ToDo() {
         this("", LocalDate.now(), false);
     }
 
-    public Task(String description, LocalDate dueDate) {
+    public ToDo(String description, LocalDate dueDate) {
         this(description, dueDate, false);
     }
 
-    public Task(String description, LocalDate dueDate, boolean complete) {
+    public ToDo(String description, LocalDate dueDate, boolean complete) {
         this.description = new SimpleStringProperty(description);
         this.dueDate = new SimpleObjectProperty<>(dueDate);
         this.complete = new SimpleBooleanProperty(false);
     }
 
-    public static Callback<Task, Observable[]> extractor() {
-        return (Task task) -> new Observable[]{
-                task.descriptionProperty(),
-                task.dueDateProperty(),
-                task.completeProperty()
+    public static Callback<ToDo, Observable[]> extractor() {
+        return (ToDo todo) -> new Observable[]{
+                todo.descriptionProperty(),
+                todo.dueDateProperty(),
+                todo.completeProperty()
         };
     }
 
@@ -48,12 +48,20 @@ public class Task implements Serializable, Comparable<Task> {
         this.description.set(description);
     }
 
+    public final StringProperty descriptionProperty() {
+        return description;
+    }
+
     public final LocalDate getDueDate() {
         return dueDate.get();
     }
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate.set(dueDate);
+    }
+
+    public final ObjectProperty<LocalDate> dueDateProperty() {
+        return dueDate;
     }
 
     public final boolean isComplete() {
@@ -64,21 +72,13 @@ public class Task implements Serializable, Comparable<Task> {
         this.complete.set(complete);
     }
 
-    public final StringProperty descriptionProperty() {
-        return description;
-    }
-
-    public final ObjectProperty<LocalDate> dueDateProperty() {
-        return dueDate;
-    }
-
     public final BooleanProperty completeProperty() {
         return complete;
     }
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "ToDo{" +
                 "dueDate=" + this.getDueDate() +
                 ", description=" + this.getDesc() +
                 ", complete=" + this.isComplete() + "}";
@@ -87,7 +87,7 @@ public class Task implements Serializable, Comparable<Task> {
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
-        if (!(obj instanceof Task i)) return false;
+        if (!(obj instanceof ToDo i)) return false;
         return this.getDesc().equals(i.getDesc())
                 && this.getDueDate().equals(i.getDueDate())
                 && (this.isComplete() == i.isComplete());
@@ -103,7 +103,7 @@ public class Task implements Serializable, Comparable<Task> {
     }
 
     @Override
-    public int compareTo(Task task) {
-        return this.description.get().compareTo(task.description.get());
+    public int compareTo(ToDo todo) {
+        return this.description.get().compareTo(todo.description.get());
     }
 }
