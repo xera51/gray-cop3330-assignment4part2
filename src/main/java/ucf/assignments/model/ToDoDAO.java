@@ -6,7 +6,6 @@ import ucf.assignments.ToDoListSerializer;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.util.Collection;
 
@@ -14,7 +13,15 @@ public class ToDoDAO {
 
     private File listFile;
 
-    public ToDoDAO() {}
+    public ToDoDAO() { listFile = null; }
+
+    public File getListFile() {
+        return listFile;
+    }
+
+    public void setListFileToNull() {
+        listFile = null;
+    }
 
     /* Creates a new file using the dir as the directory and fileName as the file name
      * If succeeds, this ToDoDAO's listFile is set

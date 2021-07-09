@@ -8,17 +8,20 @@ package ucf.assignments;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import ucf.assignments.model.ToDo;
 
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class ToDoListSerializer {
 
     private static final Type LOCAL_DATE_PROPERTY_TYPE = new TypeToken<ObjectProperty<LocalDate>>(){}.getType();
-    private static final Type COLLECTION_TYPE = new TypeToken<ObservableList<Item>>(){}.getType();
+    private static final Type COLLECTION_TYPE = new TypeToken<ObservableList<ToDo>>(){}.getType();
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(SimpleStringProperty.class, new StringPropertySerializer())
@@ -29,15 +32,18 @@ public class ToDoListSerializer {
             .registerTypeAdapter(BooleanProperty.class, new BooleanPropertyDeserializer())
             .create();
 
-    public static Collection<? extends Item> fromJson(Reader json) {
-        try {
-            return gson.fromJson(json, COLLECTION_TYPE);
-        } catch (JsonIOException | JsonSyntaxException e) {
+    public static Collection<? extends ToDo> fromJson(File json) {
+        if (json.length() == 0) return new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(json))){
+            return gson.fromJson(reader, COLLECTION_TYPE);
+        } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException("Improper format for To-Do List");
+        } catch (JsonIOException | IOException e) {
+            throw new JsonIOException("Failed to Read Json");
         }
     }
 
-    public static String toJson(ObservableList<Item> list) {
+    public static String toJson(Collection<? extends ToDo> list) {
         return gson.toJson(list.toArray());
     }
 
