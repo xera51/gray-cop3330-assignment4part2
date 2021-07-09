@@ -13,6 +13,8 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.time.LocalDate;
+
 // TODO make icon a variable so other windows can access
 public class ToDoListManager extends Application {
 

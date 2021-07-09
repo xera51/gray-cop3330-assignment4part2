@@ -1,126 +1,64 @@
 @startuml
 
 package ucf.assignments {
+
+    package model {
+        class Todo implements java.io.Serializable, java.lang.Comparable{
+            - description : StringProperty
+            - dueDate : ObjectProperty<LocalDate>
+            - complete : BooleanProperty
+
+            + Todo(): Todo
+            + Todo(String description, LocalDate dueDate): Todo
+            + Todo(String description, LocalDate dueDate, boolean complete): Todo
+
+            + getDesc(): String
+            + setDesc(String description): void
+            + descriptionProperty(): StringProperty
+            + getDueDate(): LocalDate
+            + setDueDate(LocalDate dueDate): void
+            + dueDateProperty(): ObjectProperty<LocalDate>
+            + isComplete(): boolean
+            + setComplete(boolean complete): void
+            + completeProperty(): BooleanProperty
+
+            + toString(): String
+            + equals(Object obj): int
+            + hashCode(): int
+            + compareTo(Todo todo): int
+        }
+
+        class ToDoDAO {
+            - listFile : File
+
+            + ToDoDAO(): ToDoDAO
+
+            + getListFile(): File
+            + setListFileToNull(): void
+
+            + create(File dir, String fileName): void
+            + open(File file): void
+            + read(): Collection<? extends ToDo>
+            + save(Collection<? extends ToDo> toDoList): boolean
+            + delete(): boolean
+        }
+    }
+
+
     class ToDoListManager {
         + start(Stage primaryStage): void
         + {static} main(String[] args): void
     }
 
-    class ToDoListManagerController {
-        ~ model : ToDoListManagerModel
-
-        - toDoListsLabel : Label
-        - toDoListsListView : ListView<?>
-        - addListButton : Button
-        - saveAllListsButton : Button
-        - allRadioButton : RadioButton
-        - filterToggleGroup : ToggleGroup
-        - completeRadioButton : RadioButton
-        - incompleteRadioButton : RadioButton
-        - addItemButton : Button
-        - saveListButton : Button
-        - toDoListListView : ListView<?>
-        - deleteItemButton : Button
-        - completeCheckbox : CheckBox
-        - dueLabel : Label
-        - dueDateField : TextField
-        - editDueButton : Button
-        - descriptionLabel : Label
-        - editDescButton : Button
-        - listTitleField : TextField
-        - editListButton : Button
-        - deleteListButton : Button
-        - descriptionField : TextField
-
-        + initialize(URL location, ResourceBundle resources): void
-        ~ addItem(ActionEvent event): void
-        ~ addList(ActionEvent event): void
-        ~ deleteItem(ActionEvent event): void
-        ~ deleteList(ActionEvent event): void
-        ~ editDesc(ActionEvent event): void
-        ~ editDue(ActionEvent event): void
-        ~ editList(ActionEvent event): void
-        ~ saveAllLists(ActionEvent event): void
-        ~ saveList(ActionEvent event): void
-        ~ toggleComplete(ActionEvent event): void
-        ~ descEdited(InputMethodEvent event): void
-        ~ dueEdited(InputMethodEvent event): void
-        ~ listTitleEdited(InputMethodEvent event): void
-    }
-
-    class ToDoList {
-        - title : StringProperty
-        - list : ObjectProperty<List<Item>>
-
-        + ToDoList(): ToDoList
-        + ToDoList(String title, List<Item> list): ToDoList
-
-        + getTitle(): String
-        + getList(): List<Item>
-        + setTitle(String title): void
-        + setList(List<Item> list): void
-        + titleProperty(): StringProperty
-        + listProperty(): ObjectProperty<List<Item>>
-
-        + add(Item item): void
-        + remove(Item item): void
-    }
-
-    class Item {
-        - description : StringProperty
-        - dueDate : ObjectProperty<LocalDate>
-        - complete : BooleanProperty
-        __Constructors__
-        + Item(): Item
-        + Item(String description, LocalDate dueDate): Item
-        __Accessors/Mutators__
-        + getDesc(): String
-        + getDueDate(): LocalDate
-        + isComplete(): boolean
-        + setDesc(String description): void
-        + setDueDate(LocalDate dueDate): void
-        + setComplete(boolean complete): void
-        + descriptionProperty(): StringProperty
-        + dueDateProperty(): ObjectProperty<LocalDate>
-        + completeProperty(): BooleanProperty
-    }
-
-    class ToDoListManagerModel {
-        ~ toDoListsObservableList : ObservableList<ToDoList>
-
-        ~ loadData(): void
-        ~ saveToDoList(String listName): void
-        ~ saveAllToDoLists(): void
-    }
-
-    class AddItemController {
-        - header : Label
-        - description : TextArea
-        - dueDate : DatePicker
-        - submitButton : Button
-        - cancelButton : Button
-        - item : Item
-
-        ~ submit(ActionEvent event): void
-        ~ cancel(ActionEvent event): void
-    }
-
-    class AddListController {
-        - title : TextField
-        - confirmButton : Button
-        - cancelButton : Button
-        - list : ToDoList
-
-        ~ submit(ActionEvent event): void
-        ~ cancel(ActionEvent event): void
-    }
-
-    ToDoList *-- Item
-    ToDoListManagerModel o-- ToDoList
-    ToDoListManagerController *-- ToDoListManagerModel
-    ToDoListManagerController <-- "Creates" ToDoListManager
-    AddItemController <-- "Creates" ToDoListManagerController
-    AddListController <-- "Creates" ToDoListManagerController
 }
+
+
+package java.lang {
+    interface Comparable<Todo>{
+        + compareTo(Todo o): int
+    }
+}
+
+
 
 @enduml

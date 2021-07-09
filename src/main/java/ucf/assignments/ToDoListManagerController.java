@@ -7,6 +7,9 @@ package ucf.assignments;
 
 import com.google.gson.JsonSyntaxException;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,28 +18,36 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import ucf.assignments.model.ToDo;
+import ucf.assignments.model.ToDoDAO;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 
 // TODO open operations currently silently fail if user picks wrong filetype, instead of notifying
 public class ToDoListManagerController implements Initializable {
 
-    ToDoListManagerModel model = new ToDoListManagerModel();
-    
+    ToDoDAO dao = new ToDoDAO();
+
     // TODO update to what dir user last left off in when using new or open
     private static File defaultDir = null;
     private static final FileChooser fileChooser = new FileChooser();
 
     // TODO: update wildcards in ListViews
 
+    @FXML private BorderPane root;
     @FXML private MenuBar menuBar;
     @FXML private MenuItem newListMenuItem;
+    @FXML private ListView<ToDo> itemListView;
+    @FXML private Button addButton;
 
     @FXML private Button deleteItemButton;
     @FXML private CheckBox completeCheckbox;
@@ -48,74 +59,134 @@ public class ToDoListManagerController implements Initializable {
     @FXML private TextField listTitleField;
     @FXML private Button editListButton;
     @FXML private Button deleteListButton;
+    @FXML private TextArea descriptionField;
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        // Set up default directory for list files
-        defaultDir = new File(System.getProperty("user.dir") +
-                File.separator + "lists" + File.separator);
-        if(!defaultDir.exists()) defaultDir.mkdir();
+        // Set up defaultDir
+        defaultDir = makeListsDir();
 
-        // Set up FileChooser
+        // Set up fileChooser
         fileChooser.setInitialDirectory(defaultDir);
         fileChooser.getExtensionFilters().addAll(new ExtensionFilter("JSON file", "*.json"));
 
+
+        // Set up itemListView
+        itemListView.setItems(FXCollections.observableArrayList(ToDo.extractor()));
+        itemListView.setCellFactory(lv -> new TaskCell());
+
+        // TODO will need to be updated because of dueDate, perhaps extract
+        itemListView.getSelectionModel().selectedIndexProperty().addListener(
+                (observable, oldValue, newValue) -> descriptionField.setDisable(
+                        itemListView.getSelectionModel().getSelectedIndex() < 0));
+
+
+        // Set up descriptionField
+        StringBinding descriptionBinding =
+                Bindings.when(itemListView.getSelectionModel().selectedIndexProperty().lessThan(0))
+                        .then("")
+                        .otherwise(
+                Bindings.selectString(
+                        itemListView.getSelectionModel().selectedItemProperty(),
+                        "description"));
+
+        descriptionField.textProperty().bind(descriptionBinding);
+
+        // Allows user to type in descriptionField,
+        // When they leave the field, edits the current item's description
+        descriptionField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (itemListView.getSelectionModel().getSelectedIndex() >= 0) {
+                if (newValue) {
+                    descriptionField.textProperty().unbind();
+                } else {
+                    if(!itemListView.isFocused())
+                        itemListView.getSelectionModel().getSelectedItem().descriptionProperty().set(descriptionField.getText());
+                    descriptionField.textProperty().bind(descriptionBinding);
+                }
+            }
+        });
+
+        descriptionField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if(!event.isShiftDown() && event.getCode() == KeyCode.ENTER) {
+                event.consume();
+                root.requestFocus();
+            }
+        });
     }
 
     @FXML
     void newList(ActionEvent event) {
         // if unsaved list open, warn
-        // create new file pop up window
-            // asks for file name and file dir
-        // if not null, set as current file in model
+        // prompt for new file
+
+        // TODO commented code
+        /*
+        try {
+            dao.create();
+            itemListView.getItems().clear();
+        } catch (FileAlreadyExistsException e) {
+            // Alert user file/list already exists
+        } catch (IOException e) {
+            // Alert user file/list could not be created
+        } */
     }
 
     @FXML
     void openList(ActionEvent event) {
         // if unsaved list open, warn
+        setFileChooserDir();
         fileChooser.setTitle("Open List");
         File selectedFile = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
-        if(this.validateFile(selectedFile)) {
+
+        if(selectedFile != null) {
             try {
-                model.open(selectedFile);
+                defaultDir = selectedFile.getParentFile();
+                dao.open(selectedFile);
+                itemListView.getItems().setAll(dao.read());
             } catch (JsonSyntaxException e) {
-                // TODO error window
-                System.out.println("Throw error window (is json, but not proper format)");
+                // Alert the user the Json file is invalid
             }
-            defaultDir = selectedFile.getParentFile();
         }
     }
 
     @FXML
     void closeList(ActionEvent event) {
         // if not saved, warn
-        // if not cancelled, clear model
-        model.close();
+        dao.setListFileToNull();
+        itemListView.getItems().clear();
     }
 
     @FXML
     void save(ActionEvent event) {
-        // if list not associated with file, call newList
-        model.save();
+        if(dao.getListFile() == null) {
+            // prompt for new file or maybe also choose a file? save vs save as?
+            //TODO commented code
+            //dao.create();
+        }
+        if (!dao.save(itemListView.getItems())) {
+            // alert user save failed
+        }
     }
 
     @FXML
     void saveAs(ActionEvent event) {
         // TODO need to be able to choose an already existing file or be able to create new
+        setFileChooserDir();
         fileChooser.setTitle("Save As");
         File selectedFile = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
-        if(this.validateFile(selectedFile)) {
-            model.setListFile(selectedFile);
-            model.save();
-        }
+
     }
 
-    // TODO confirm delete window (can't be undone)
+
     @FXML
     void deleteList(ActionEvent event) {
-        model.delete();
+        // TODO confirm delete window (can't be undone)
+        if(!dao.delete()) {
+            // alert user could not delete
+        } else {
+            itemListView.getItems().clear();
+        }
     }
 
     @FXML
@@ -126,7 +197,12 @@ public class ToDoListManagerController implements Initializable {
 
     @FXML
     void addItem(ActionEvent event) {
-
+        // TODO currently test code, needs to be deleted
+        String[] strings = {"random", "a string", "cool"};
+        Random random = new Random();
+        itemListView.getSelectionModel().getSelectedItem().setDesc(
+                strings[random.nextInt(3)]
+        );
     }
 
     @FXML
@@ -141,7 +217,28 @@ public class ToDoListManagerController implements Initializable {
 
     @FXML
     void descEdited(InputMethodEvent event) {
+        // prevent from going greater than 256 and less than 1
+        // wrong function, needs to be key typed i believe
+        // display little thing to notify user cant be longer than 256
+        // or empty
+    }
 
+    @FXML
+    void descFieldKeyPressed(KeyEvent event) {
+        if(itemListView.getSelectionModel().getSelectedIndex() >= 0) {
+            if(event.getCode() == KeyCode.ENTER) {
+                if(event.isShiftDown()) {
+                    descriptionField.insertText(descriptionField.getCaretPosition(), System.lineSeparator());
+                } else {
+                    event.consume();
+                    root.requestFocus();
+                }
+            }
+            if (event.getCode() == KeyCode.ESCAPE) {
+                descriptionField.setText(itemListView.getSelectionModel().getSelectedItem().getDesc());
+                root.requestFocus();
+            }
+        }
     }
 
     @FXML
@@ -181,7 +278,18 @@ public class ToDoListManagerController implements Initializable {
 
     }
 
-    private boolean validateFile(File file) {
-        return file != null && file.toString().endsWith(".json");
+    // If the directory for the file chooser was deleted, sets directory to ./lists
+    private void setFileChooserDir() {
+        if(!fileChooser.getInitialDirectory().exists()) {
+            fileChooser.setInitialDirectory(makeListsDir());
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private File makeListsDir() {
+        File listDir = new File(System.getProperty("user.dir") +
+                File.separator + "lists" + File.separator);
+        if(!listDir.exists()) defaultDir.mkdir();
+        return listDir;
     }
 }

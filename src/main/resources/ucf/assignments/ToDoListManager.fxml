@@ -18,32 +18,33 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" stylesheets="@ToDoListManager.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ucf.assignments.ToDoListManagerController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@ToDoListManager.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ucf.assignments.ToDoListManagerController">
    <top>
-      <MenuBar BorderPane.alignment="CENTER">
+      <MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
         <menus>
           <Menu mnemonicParsing="false" text="_File">
             <items>
-                  <MenuItem mnemonicParsing="false" text="New List">
+                  <MenuItem fx:id="newListMenuItem" mnemonicParsing="false" onAction="#newList" text="New List">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem mnemonicParsing="false" text="Open...">
+                  <MenuItem mnemonicParsing="false" onAction="#openList" text="Open...">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
-              <MenuItem mnemonicParsing="false" text="Close List" />
+              <MenuItem mnemonicParsing="false" onAction="#closeList" text="Close List" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Save">
+                  <MenuItem mnemonicParsing="false" onAction="#save" text="Save">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem mnemonicParsing="false" text="Save As..." />
+                  <MenuItem mnemonicParsing="false" onAction="#saveAs" text="Save As..." />
+                  <MenuItem mnemonicParsing="false" onAction="#deleteList" text="Delete List" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Exit">
+                  <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit">
                      <accelerator>
                         <KeyCodeCombination alt="DOWN" code="F4" control="UP" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
@@ -52,13 +53,13 @@
           </Menu>
           <Menu mnemonicParsing="false" text="_Edit">
             <items>
-                  <MenuItem mnemonicParsing="false" text="Add Item" />
-              <MenuItem mnemonicParsing="false" text="Delete Item">
+                  <MenuItem mnemonicParsing="false" onAction="#addItem" text="Add Item" />
+              <MenuItem mnemonicParsing="false" onAction="#deleteItem" text="Delete Item">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="DELETE" control="UP" meta="ANY" shift="UP" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem mnemonicParsing="false" text="Clear All Items">
+                  <MenuItem mnemonicParsing="false" onAction="#deleteAllItems" text="Delete All Items">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="DELETE" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
@@ -67,9 +68,9 @@
           </Menu>
             <Menu mnemonicParsing="false" text="_View">
               <items>
-                <MenuItem mnemonicParsing="false" text="Show All Items" />
-                  <MenuItem mnemonicParsing="false" text="Show Incomplete Items" />
-                  <MenuItem mnemonicParsing="false" text="Show Complete Items" />
+                <MenuItem mnemonicParsing="false" onAction="#showAllItems" text="Show All Items" />
+                  <MenuItem mnemonicParsing="false" onAction="#showIncompleteItems" text="Show Incomplete Items" />
+                  <MenuItem mnemonicParsing="false" onAction="#showCompleteItems" text="Show Complete Items" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="_Help">
@@ -81,7 +82,7 @@
       </MenuBar>
    </top>
    <left>
-      <BorderPane prefHeight="200.0" prefWidth="250.0" styleClass="borderpane" BorderPane.alignment="CENTER">
+      <BorderPane prefHeight="200.0" prefWidth="300.0" styleClass="borderpane" BorderPane.alignment="CENTER">
          <top>
             <HBox alignment="BOTTOM_CENTER" prefWidth="200.0" BorderPane.alignment="CENTER">
                <children>
@@ -97,7 +98,7 @@
                       <MenuItem mnemonicParsing="false" text="Due Date" />
                     </items>
                   </MenuButton>
-                  <Button mnemonicParsing="false" text="+" />
+                  <Button fx:id="addButton" mnemonicParsing="false" onAction="#addItem" text="+" />
                   <Button mnemonicParsing="false" text="-" />
                </children>
                <BorderPane.margin>
@@ -120,7 +121,7 @@
             </HBox>
          </bottom>
          <center>
-            <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <BorderPane prefHeight="200.0" prefWidth="200.0" styleClass="borderpane" BorderPane.alignment="CENTER">
                <bottom>
                   <CheckBox fx:id="completeCheckbox" mnemonicParsing="false" onAction="#toggleComplete" text="Complete?" BorderPane.alignment="CENTER" />
                </bottom>
@@ -142,24 +143,14 @@
                               <Button fx:id="editDescButton" mnemonicParsing="false" onAction="#editDesc" />
                            </children>
                         </HBox>
-                        <TextArea fx:id="descriptionField" onInputMethodTextChanged="#descEdited" prefHeight="174.0" prefWidth="200.0" />
+                        <TextArea fx:id="descriptionField" disable="true" onInputMethodTextChanged="#descEdited" onKeyPressed="#descFieldKeyPressed" prefHeight="174.0" prefWidth="200.0" />
                      </children>
                   </VBox>
                </center>
             </BorderPane>
          </center>
          <top>
-            <VBox prefHeight="100.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-               <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <TextField fx:id="listTitleField" onInputMethodTextChanged="#listTitleEdited" />
-                        <Button fx:id="editListButton" mnemonicParsing="false" onAction="#editList" />
-                     </children>
-                  </HBox>
-                  <Button fx:id="deleteListButton" mnemonicParsing="false" onAction="#deleteList" text="Delete List" />
-               </children>
-            </VBox>
+            <VBox prefHeight="100.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
          </top>
       </BorderPane>
    </center>
