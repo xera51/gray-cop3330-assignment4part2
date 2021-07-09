@@ -3,7 +3,7 @@
  *  Copyright 2021 Christopher Gray
  */
 
-package ucf.assignments;
+package ucf.assignments.util;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;

@@ -2,7 +2,7 @@ package ucf.assignments.model;
 
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import ucf.assignments.ToDoListSerializer;
+import ucf.assignments.util.ToDoListSerializer;
 
 import java.io.File;
 import java.io.IOException;
