@@ -1,5 +1,7 @@
 @startuml
 
+skinparam groupInheritance 3
+
 package ucf.assignments {
 
     package model {
@@ -44,6 +46,57 @@ package ucf.assignments {
         }
     }
 
+    package util {
+
+        class ToDoListSerializer {
+            - {static} LOCAL_DATE_PROPERTY_TYPE : Type
+            - {static} COLLECTION_TYPE : Type
+            - {static} GSON : Gson
+
+            + {static} fromJson(File json) : Collection<? extends ToDo>
+            + {static} toJson(Collection<? extends ToDo> list) : String
+        }
+
+        class StringPropertySerializer implements com.google.gson.JsonSerializer {
+           + serialize(SimpleStringProperty src, Type typeOfSrc,
+           JsonSerializationContext context):  JsonElement
+        }
+
+        class LocalDatePropertySerializer implements com.google.gson.JsonSerializer{
+            + serialize(ObjectProperty<LocalDate> src, Type typeOfSrc,
+            JsonSerializationContext context): JsonElement
+        }
+
+        class BooleanPropertySerializer implements com.google.gson.JsonSerializer {
+            + serialize(SimpleBooleanProperty src, Type typeOfSrc,
+            JsonSerializationContext context): JsonElement
+        }
+
+        class StringPropertyDeserializer implements com.google.gson.JsonDeserializer {
+            + deserialize(JsonElement json, Type typeOfT,
+            JsonDeserializationContext context): StringProperty
+        }
+
+        class LocalDatePropertyDeserializer implements com.google.gson.JsonDeserializer {
+            + deserialize(JsonElement json, Type typeOfT,
+            JsonDeserializationContext context): ObjectProperty<LocalDate>
+        }
+
+        class BooleanPropertyDeserializer implements com.google.gson.JsonDeserializer {
+            + deserialize(JsonElement json, Type typeOfT,
+            JsonDeserializationContext context): BooleanProperty
+        }
+
+        ToDoDAO .> ToDoListSerializer : «uses» >
+        ToDoListSerializer +- StringPropertySerializer
+        ToDoListSerializer +-- LocalDatePropertySerializer
+        ToDoListSerializer +--- BooleanPropertySerializer
+        ToDoListSerializer +--- StringPropertyDeserializer
+        ToDoListSerializer +-- LocalDatePropertyDeserializer
+        ToDoListSerializer +- BooleanPropertyDeserializer
+    }
+
+
 
     class ToDoListManager {
         + start(Stage primaryStage): void
@@ -52,8 +105,34 @@ package ucf.assignments {
 
 }
 
+package com.google.gson {
+
+    interface JsonSerializer<T> {
+        + serialize(T src, Type typeOfSrc,
+        JsonSerializationContext context): JsonElement
+    }
+
+    interface JsonDeserializer<T> {
+        + deserialize(JsonElement json, Type typeOfT,
+        JsonDeserializationContext context): T
+    }
+
+    class Gson {
+
+    }
+
+    class GsonBuilder {
+
+    }
+
+
+}
+
+ToDoListSerializer .> com.google.gson.GsonBuilder : «uses» >
+ToDoListSerializer o-- com.google.gson.Gson
 
 package java.lang {
+
     interface Comparable<Todo>{
         + compareTo(Todo o): int
     }
