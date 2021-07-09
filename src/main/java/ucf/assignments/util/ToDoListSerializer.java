@@ -8,7 +8,6 @@ package ucf.assignments.util;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ucf.assignments.model.ToDo;
 
@@ -22,7 +21,7 @@ public class ToDoListSerializer {
 
     private static final Type LOCAL_DATE_PROPERTY_TYPE = new TypeToken<ObjectProperty<LocalDate>>(){}.getType();
     private static final Type COLLECTION_TYPE = new TypeToken<ObservableList<ToDo>>(){}.getType();
-    private static final Gson gson = new GsonBuilder()
+    private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(SimpleStringProperty.class, new StringPropertySerializer())
             .registerTypeAdapter(LOCAL_DATE_PROPERTY_TYPE, new LocalDatePropertySerializer())
@@ -35,7 +34,7 @@ public class ToDoListSerializer {
     public static Collection<? extends ToDo> fromJson(File json) {
         if (json.length() == 0) return new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(json))){
-            return gson.fromJson(reader, COLLECTION_TYPE);
+            return GSON.fromJson(reader, COLLECTION_TYPE);
         } catch (JsonSyntaxException e) {
             throw new JsonSyntaxException("Improper format for To-Do List");
         } catch (JsonIOException | IOException e) {
@@ -44,7 +43,7 @@ public class ToDoListSerializer {
     }
 
     public static String toJson(Collection<? extends ToDo> list) {
-        return gson.toJson(list.toArray());
+        return GSON.toJson(list.toArray());
     }
 
     private static class StringPropertySerializer implements JsonSerializer<SimpleStringProperty> {
