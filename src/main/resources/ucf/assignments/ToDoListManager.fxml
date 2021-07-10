@@ -8,7 +8,6 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.input.KeyCodeCombination?>
@@ -66,9 +65,9 @@
           </Menu>
             <Menu mnemonicParsing="false" text="_View">
               <items>
-                <MenuItem mnemonicParsing="false" onAction="#showAllItems" text="Show All Items" />
-                  <MenuItem mnemonicParsing="false" onAction="#showIncompleteItems" text="Show Incomplete Items" />
-                  <MenuItem mnemonicParsing="false" onAction="#showCompleteItems" text="Show Complete Items" />
+                <MenuItem mnemonicParsing="false" onAction="#showAllToDos" text="Show All Items" />
+                  <MenuItem mnemonicParsing="false" onAction="#showIncompleteToDos" text="Show Incomplete Items" />
+                  <MenuItem mnemonicParsing="false" onAction="#showCompleteToDos" text="Show Complete Items" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="_Help">
@@ -107,7 +106,7 @@
                               <Button fx:id="editDescButton" mnemonicParsing="false" onAction="#editDesc" />
                            </children>
                         </HBox>
-                        <TextArea fx:id="descriptionField" disable="true" onInputMethodTextChanged="#descEdited" onKeyPressed="#descFieldKeyPressed" prefHeight="174.0" prefWidth="200.0" />
+                        <TextArea fx:id="descriptionField" disable="true" onKeyPressed="#descFieldKeyPressed" prefHeight="174.0" prefWidth="200.0" />
                      </children>
                   </VBox>
                </center>
@@ -129,10 +128,11 @@
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
             <MenuButton mnemonicParsing="false" prefHeight="26.0" text="Show">
-              <items>
-                  <RadioMenuItem mnemonicParsing="false" text="Incomplete" />
-                  <RadioMenuItem mnemonicParsing="false" text="Complete" />
-              </items>
+               <items>
+                  <MenuItem fx:id="showAllItem" mnemonicParsing="false" onAction="#showAllToDos" text="Show All" />
+                  <MenuItem fx:id="showCompleteItem" mnemonicParsing="false" onAction="#showCompleteToDos" text="Show Complete" />
+                  <MenuItem fx:id="showIncompleteItem" mnemonicParsing="false" onAction="#showIncompleteToDos" text="Show Incomplete" />
+               </items>
             </MenuButton>
             <MenuButton mnemonicParsing="false" prefHeight="26.0" text="Sort">
               <items>

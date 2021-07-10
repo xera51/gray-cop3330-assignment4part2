@@ -10,10 +10,8 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyCode;
@@ -27,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import ucf.assignments.model.ToDo;
 import ucf.assignments.model.ToDoDAO;
+import ucf.assignments.model.ToDoListManagerModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,13 +42,14 @@ public class ToDoListManagerController {
 
     ToDoDAO dao = new ToDoDAO();
 
-    // TODO update to what dir user last left off in when using new or open
+    ToDoListManagerModel model = new ToDoListManagerModel();
+
     private File defaultDir = null;
     private final FileChooser fileChooser = new FileChooser();
+    private final DirectoryChooser directoryChooser = new DirectoryChooser();
     private IndexRange descriptionPreviousSelection = new IndexRange(0, 0);
     Stage stage;
 
-    // TODO: update wildcards in ListViews
 
     @FXML private BorderPane root;
     @FXML private MenuBar menuBar;
@@ -67,6 +67,14 @@ public class ToDoListManagerController {
     @FXML private Button editListButton;
     @FXML private Button deleteListButton;
     @FXML private TextArea descriptionField;
+    @FXML
+    private MenuItem showAllItem;
+
+    @FXML
+    private MenuItem showCompleteItem;
+
+    @FXML
+    private MenuItem showIncompleteItem;
 
 
     ToDoListManagerController(Stage stage) {
@@ -85,8 +93,11 @@ public class ToDoListManagerController {
         fileChooser.setInitialDirectory(defaultDir);
         fileChooser.getExtensionFilters().add(new ExtensionFilter("JSON file", "*.json"));
 
+        // Set up directoryChooser
+        directoryChooser.setInitialDirectory(defaultDir);
+
         // Set up itemListView
-        itemListView.setItems(FXCollections.observableArrayList(ToDo.extractor()));
+        itemListView.setItems(model.getFilteredToDoList());
         itemListView.setCellFactory(lv -> new TaskCell());
 
         // Disables description and dueDate fields when no item selected
@@ -103,6 +114,9 @@ public class ToDoListManagerController {
 
 
         // Set up descriptionField
+        directoryChooser.setTitle("Set Location");
+        setChooserDir();
+        directoryChooser.setInitialDirectory(fileChooser.getInitialDirectory());
 
         // Binds to the current selection's description. If no selection, binds to ""
         StringBinding descriptionBinding =
@@ -181,15 +195,9 @@ public class ToDoListManagerController {
         dueDateField.setValue(null);
         dueDateField.valueProperty().bind(dueDateBinding);
 
-
-        //TODO make better
         dueDateField.setConverter(new StringConverter<>() {
             final String pattern = "yyyy-MM-dd";
             final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
-
-            {
-
-            }
 
             @Override
             public String toString(LocalDate date) {
@@ -210,150 +218,100 @@ public class ToDoListManagerController {
             }
         });
 
-        // TODO on close request
+        dueDateField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if(!event.isShiftDown() && event.getCode() == KeyCode.ENTER) {
+                event.consume();
+                root.requestFocus();
+            }
+        });
     }
 
     @FXML
     void newList(ActionEvent event) {
-        TextInputDialog listNameDialog = new TextInputDialog();
-        listNameDialog.getEditor().setPromptText("List Name");
-        listNameDialog.setTitle("New List");
-        listNameDialog.setHeaderText(null);
-        Label label = new Label("List Name");
-        label.setPrefHeight(listNameDialog.getEditor().getHeight() + 25);
-        label.setAlignment(Pos.CENTER);
-        listNameDialog.setGraphic(label);
-        listNameDialog.initOwner(stage);
-        listNameDialog.showAndWait().ifPresent(fileName -> {
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setTitle("Set Location");
-            setFileChooserDir();
-            directoryChooser.setInitialDirectory(fileChooser.getInitialDirectory());
+        PopUps.getNewListPopUp(stage).showAndWait().ifPresent(fileName -> {
+            setChooserDir();
             File selectedDirectory = directoryChooser.showDialog(stage);
-            try {
-                defaultDir = selectedDirectory;
-                dao.create(selectedDirectory, fileName);
-                itemListView.getItems().setAll(dao.read());
-            } catch (FileAlreadyExistsException e) {
-                Alert noListAlert = new Alert(Alert.AlertType.WARNING);
-                noListAlert.setTitle("List Creation Failed");
-                noListAlert.setHeaderText(null);
-                noListAlert.getDialogPane().setContent(new Label("List already exists!"));
-                ((Label) noListAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
-                noListAlert.initOwner(stage);
-                noListAlert.show();
-            } catch (IOException | InvalidPathException e) {
-                Alert deleteFailedAlert = new Alert(Alert.AlertType.ERROR);
-                deleteFailedAlert.setTitle("List Creation Failed");
-                deleteFailedAlert.setHeaderText(null);
-                deleteFailedAlert.getDialogPane().setContent(new Label("Error: Failed to Create List (List names must be a valid file name)"));
-                ((Label) deleteFailedAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
-                deleteFailedAlert.initOwner(stage);
-                deleteFailedAlert.show();
-                System.out.println("failed to create");
+            if(selectedDirectory != null) {
+                try {
+                    defaultDir = selectedDirectory;
+                    model.createList(selectedDirectory, fileName);
+                    model.loadList();
+                } catch (FileAlreadyExistsException e) {
+                    PopUps.getListAlreadyExistsPopUp(stage).show();
+                } catch (IOException | InvalidPathException e) {
+                    PopUps.getListCreationFailedPopUp(stage).show();
+                }
             }
         });
     }
 
     @FXML
     void openList(ActionEvent event) {
-        // if unsaved list open, warn
-        setFileChooserDir();
+        // TODO warn unsaved
+        setChooserDir();
         fileChooser.setTitle("Open List");
         File selectedFile = fileChooser.showOpenDialog(stage);
 
         if(selectedFile != null) {
             try {
                 defaultDir = selectedFile.getParentFile();
-                dao.open(selectedFile);
-                itemListView.getItems().setAll(dao.read());
+                model.openList(selectedFile);
+                model.loadList();
             } catch (JsonSyntaxException e) {
-                Alert deleteFailedAlert = new Alert(Alert.AlertType.ERROR);
-                deleteFailedAlert.setTitle("Invalid File");
-                deleteFailedAlert.setHeaderText(null);
-                deleteFailedAlert.getDialogPane().setContent(new Label("Invalid JSON file!"));
-                ((Label) deleteFailedAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
-                deleteFailedAlert.initOwner(stage);
-                deleteFailedAlert.show();
+                PopUps.getInvalidJsonFilePopUp(stage).show();
             }
         }
     }
 
     @FXML
     void closeList(ActionEvent event) {
-        // TODO warn unsaved
-        root.requestFocus();
-        dao.setListFileToNull();
-        itemListView.getItems().clear();
+        if(model.getDao().getListFile() != null) {
+            // TODO warn unsaved
+            root.requestFocus();
+            model.clearList();
+        }
     }
 
     @FXML
     void save(ActionEvent event) {
-        if(dao.getListFile() == null) {
+        // TODO set saved to true
+        if(model.getDao().getListFile() == null) {
             saveAs(event);
-        } else if(!dao.save(itemListView.getItems())) {
-            Alert deleteFailedAlert = new Alert(Alert.AlertType.ERROR);
-            deleteFailedAlert.setTitle("Save Failed");
-            deleteFailedAlert.setHeaderText(null);
-            deleteFailedAlert.getDialogPane().setContent(new Label("Unknown Error: Failed to Save List"));
-            ((Label) deleteFailedAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
-            deleteFailedAlert.initOwner(stage);
-            deleteFailedAlert.show();
+        } else if(!model.saveList()) {
+            PopUps.getSaveFailedPopUp(stage).show();
         }
     }
 
     @FXML
     void saveAs(ActionEvent event) {
-        setFileChooserDir();
+        // TODO set saved to true
+        setChooserDir();
         fileChooser.setTitle("Save As");
         File selectedFile = fileChooser.showSaveDialog(stage);
-        dao.open(selectedFile);
-        if (dao.save(itemListView.getItems())) {
-            defaultDir = selectedFile.getParentFile();
+
+        if(model.openList(selectedFile)) {
+            if (model.saveList()) {
+                defaultDir = selectedFile.getParentFile();
+            } else {
+                PopUps.getSaveFailedPopUp(stage).show();
+            }
         } else {
-            Alert deleteFailedAlert = new Alert(Alert.AlertType.ERROR);
-            deleteFailedAlert.setTitle("Save Failed");
-            deleteFailedAlert.setHeaderText(null);
-            deleteFailedAlert.getDialogPane().setContent(new Label("Unknown Error: Failed to Save List"));
-            ((Label) deleteFailedAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
-            deleteFailedAlert.initOwner(stage);
-            deleteFailedAlert.show();
+            PopUps.getWrongFileTypePopUp(stage).show();
         }
     }
 
     @FXML
     void deleteList(ActionEvent event) {
-        if (dao.getListFile() != null) {
-            Alert confirmDeleteAlert = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmDeleteAlert.setTitle("Delete List");
-            confirmDeleteAlert.setHeaderText(null);
-            confirmDeleteAlert.getDialogPane().setContent(new Label("Are you sure you want to delete this list?\n" +
-                    "(This action cannot be undone)"));
-            ((Label) confirmDeleteAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
-            confirmDeleteAlert.initOwner(stage);
-            confirmDeleteAlert.showAndWait().ifPresent(response -> {
+        if (model.getDao().getListFile() != null) {
+            PopUps.getDeleteConfirmationPopUp(stage).showAndWait().ifPresent(response -> {
                 if(response == ButtonType.OK) {
-                    if (!dao.delete()) {
-                        Alert deleteFailedAlert = new Alert(Alert.AlertType.ERROR);
-                        deleteFailedAlert.setTitle("Delete Failed");
-                        deleteFailedAlert.setHeaderText(null);
-                        deleteFailedAlert.getDialogPane().setContent(new Label("Unknown Error: Failed to Delete List"));
-                        ((Label) deleteFailedAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
-                        deleteFailedAlert.initOwner(stage);
-                        deleteFailedAlert.show();
-                    } else {
-                        itemListView.getItems().clear();
+                    if (!model.deleteList()) {
+                        PopUps.getDeleteFailedPopUp(stage).show();
                     }
                 }
             });
         } else {
-            Alert noListAlert = new Alert(Alert.AlertType.WARNING);
-            noListAlert.setTitle("Delete Failed");
-            noListAlert.setHeaderText(null);
-            noListAlert.getDialogPane().setContent(new Label("No List to Delete!"));
-            ((Label) noListAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
-            noListAlert.initOwner(stage);
-            noListAlert.show();
+            PopUps.getNoListToDeletePopUp(stage).show();
         }
     }
 
@@ -366,12 +324,7 @@ public class ToDoListManagerController {
 
     @FXML
     void addItem(ActionEvent event) {
-        // TODO currently test code, needs to be deleted
-        String[] strings = {"random", "a string", "cool"};
-        Random random = new Random();
-        itemListView.getSelectionModel().getSelectedItem().setDesc(
-                strings[random.nextInt(3)]
-        );
+
     }
 
     @FXML
@@ -382,14 +335,6 @@ public class ToDoListManagerController {
     @FXML
     void deleteAllItems(ActionEvent event) {
 
-    }
-
-    @FXML
-    void descEdited(InputMethodEvent event) {
-        // prevent from going greater than 256 and less than 1
-        // wrong function, needs to be key typed i believe
-        // display little thing to notify user cant be longer than 256
-        // or empty
     }
 
     @FXML
@@ -425,35 +370,30 @@ public class ToDoListManagerController {
 
     }
 
-
-
     @FXML
-    void showAllItems(ActionEvent event) {
-
+    void showAllToDos(ActionEvent event) {
+        model.filterAll();
     }
 
     @FXML
-    void showCompleteItems(ActionEvent event) {
-
+    void showCompleteToDos(ActionEvent event) {
+        model.filterComplete();
     }
 
     @FXML
-    void showIncompleteItems(ActionEvent event) {
-
+    void showIncompleteToDos(ActionEvent event) {
+        model.filterIncomplete();
     }
 
-    @FXML
-    void toggleComplete(ActionEvent event) {
-
-    }
-
-    // If the directory for the file chooser was deleted, sets directory to ./lists
-    private void setFileChooserDir() {
+    // If the directory for the file/directory chooser was deleted, sets directory to ./lists
+    private void setChooserDir() {
         if(!fileChooser.getInitialDirectory().exists()) {
             fileChooser.setInitialDirectory(makeListsDir());
+            directoryChooser.setInitialDirectory(fileChooser.getInitialDirectory());
         }
     }
 
+    // Creates the lists directory if it does not exist
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private File makeListsDir() {
         File listDir = new File(System.getProperty("user.dir") +

@@ -35,11 +35,12 @@ public class ToDoDAO {
      * If file ends with ".json", sets this ToDoDAO's listFile to passed file
      * otherwise, throws IllegalArgumentException
      */
-    public void open(File file) throws IllegalArgumentException {
+    public boolean open(File file) {
         if(file.toString().endsWith(".json")) {
             listFile = file;
+            return true;
         } else {
-            throw new IllegalArgumentException();
+            return false;
         }
 
     }
@@ -48,7 +49,7 @@ public class ToDoDAO {
      * Returns collection of To-Do Objects
      */
     public Collection<? extends ToDo> read()
-            throws JsonSyntaxException, JsonIOException {
+            throws JsonSyntaxException {
         return ToDoListSerializer.fromJson(listFile);
     }
 
