@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.net.URL;
 
@@ -23,6 +24,7 @@ public class ToDoListManager extends Application {
     public void start(Stage primaryStage) throws Exception {
         TaskCellFXML = getClass().getResource("/ucf/assignments/controllers/TaskCell.fxml");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("ToDoListManager.fxml"));
+        loader.setControllerFactory(param -> new ToDoListManagerController(primaryStage));
         Parent root = loader.load();
         Scene scene = new Scene(root);
 

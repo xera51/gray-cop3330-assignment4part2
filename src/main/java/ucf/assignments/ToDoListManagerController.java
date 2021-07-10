@@ -13,23 +13,32 @@ import javafx.beans.binding.StringBinding;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.TextAlignment;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import ucf.assignments.model.ToDo;
 import ucf.assignments.model.ToDoDAO;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.InvalidPathException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 // TODO make it so when checkbox clicked, the cell is selected
+// TODO move alerts somewhere else
+// TODO not saved alerts
 public class ToDoListManagerController {
 
     ToDoDAO dao = new ToDoDAO();
@@ -38,6 +47,7 @@ public class ToDoListManagerController {
     private File defaultDir = null;
     private final FileChooser fileChooser = new FileChooser();
     private IndexRange descriptionPreviousSelection = new IndexRange(0, 0);
+    Stage stage;
 
     // TODO: update wildcards in ListViews
 
@@ -57,6 +67,11 @@ public class ToDoListManagerController {
     @FXML private Button editListButton;
     @FXML private Button deleteListButton;
     @FXML private TextArea descriptionField;
+
+
+    ToDoListManagerController(Stage stage) {
+        this.stage = stage;
+    }
 
     // TODO if alt-tabbing, remove the highlight for the
     // menu bar so when you go back in it isnt on the menu bar
@@ -194,23 +209,50 @@ public class ToDoListManagerController {
                 }
             }
         });
+
+        // TODO on close request
     }
 
     @FXML
     void newList(ActionEvent event) {
-        // if unsaved list open, warn
-        // prompt for new file
-
-        // TODO commented code
-        /*
-        try {
-            dao.create();
-            itemListView.getItems().clear();
-        } catch (FileAlreadyExistsException e) {
-            // Alert user file/list already exists
-        } catch (IOException e) {
-            // Alert user file/list could not be created
-        } */
+        TextInputDialog listNameDialog = new TextInputDialog();
+        listNameDialog.getEditor().setPromptText("List Name");
+        listNameDialog.setTitle("New List");
+        listNameDialog.setHeaderText(null);
+        Label label = new Label("List Name");
+        label.setPrefHeight(listNameDialog.getEditor().getHeight() + 25);
+        label.setAlignment(Pos.CENTER);
+        listNameDialog.setGraphic(label);
+        listNameDialog.initOwner(stage);
+        listNameDialog.showAndWait().ifPresent(fileName -> {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Set Location");
+            setFileChooserDir();
+            directoryChooser.setInitialDirectory(fileChooser.getInitialDirectory());
+            File selectedDirectory = directoryChooser.showDialog(stage);
+            try {
+                defaultDir = selectedDirectory;
+                dao.create(selectedDirectory, fileName);
+                itemListView.getItems().setAll(dao.read());
+            } catch (FileAlreadyExistsException e) {
+                Alert noListAlert = new Alert(Alert.AlertType.WARNING);
+                noListAlert.setTitle("List Creation Failed");
+                noListAlert.setHeaderText(null);
+                noListAlert.getDialogPane().setContent(new Label("List already exists!"));
+                ((Label) noListAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
+                noListAlert.initOwner(stage);
+                noListAlert.show();
+            } catch (IOException | InvalidPathException e) {
+                Alert deleteFailedAlert = new Alert(Alert.AlertType.ERROR);
+                deleteFailedAlert.setTitle("List Creation Failed");
+                deleteFailedAlert.setHeaderText(null);
+                deleteFailedAlert.getDialogPane().setContent(new Label("Error: Failed to Create List (List names must be a valid file name)"));
+                ((Label) deleteFailedAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
+                deleteFailedAlert.initOwner(stage);
+                deleteFailedAlert.show();
+                System.out.println("failed to create");
+            }
+        });
     }
 
     @FXML
@@ -218,7 +260,7 @@ public class ToDoListManagerController {
         // if unsaved list open, warn
         setFileChooserDir();
         fileChooser.setTitle("Open List");
-        File selectedFile = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
+        File selectedFile = fileChooser.showOpenDialog(stage);
 
         if(selectedFile != null) {
             try {
@@ -226,14 +268,20 @@ public class ToDoListManagerController {
                 dao.open(selectedFile);
                 itemListView.getItems().setAll(dao.read());
             } catch (JsonSyntaxException e) {
-                // Alert the user the Json file is invalid
+                Alert deleteFailedAlert = new Alert(Alert.AlertType.ERROR);
+                deleteFailedAlert.setTitle("Invalid File");
+                deleteFailedAlert.setHeaderText(null);
+                deleteFailedAlert.getDialogPane().setContent(new Label("Invalid JSON file!"));
+                ((Label) deleteFailedAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
+                deleteFailedAlert.initOwner(stage);
+                deleteFailedAlert.show();
             }
         }
     }
 
     @FXML
     void closeList(ActionEvent event) {
-        // if not saved, warn
+        // TODO warn unsaved
         root.requestFocus();
         dao.setListFileToNull();
         itemListView.getItems().clear();
@@ -242,37 +290,76 @@ public class ToDoListManagerController {
     @FXML
     void save(ActionEvent event) {
         if(dao.getListFile() == null) {
-            // prompt for new file or maybe also choose a file? save vs save as?
-            //TODO commented code
-            //dao.create();
-        }
-        if (!dao.save(itemListView.getItems())) {
-            // alert user save failed
+            saveAs(event);
+        } else if(!dao.save(itemListView.getItems())) {
+            Alert deleteFailedAlert = new Alert(Alert.AlertType.ERROR);
+            deleteFailedAlert.setTitle("Save Failed");
+            deleteFailedAlert.setHeaderText(null);
+            deleteFailedAlert.getDialogPane().setContent(new Label("Unknown Error: Failed to Save List"));
+            ((Label) deleteFailedAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
+            deleteFailedAlert.initOwner(stage);
+            deleteFailedAlert.show();
         }
     }
 
     @FXML
     void saveAs(ActionEvent event) {
-        // TODO need to be able to choose an already existing file or be able to create new
         setFileChooserDir();
         fileChooser.setTitle("Save As");
-        File selectedFile = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
-
+        File selectedFile = fileChooser.showSaveDialog(stage);
+        dao.open(selectedFile);
+        if (dao.save(itemListView.getItems())) {
+            defaultDir = selectedFile.getParentFile();
+        } else {
+            Alert deleteFailedAlert = new Alert(Alert.AlertType.ERROR);
+            deleteFailedAlert.setTitle("Save Failed");
+            deleteFailedAlert.setHeaderText(null);
+            deleteFailedAlert.getDialogPane().setContent(new Label("Unknown Error: Failed to Save List"));
+            ((Label) deleteFailedAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
+            deleteFailedAlert.initOwner(stage);
+            deleteFailedAlert.show();
+        }
     }
-
 
     @FXML
     void deleteList(ActionEvent event) {
-        // TODO confirm delete window (can't be undone)
-        if(!dao.delete()) {
-            // alert user could not delete
+        if (dao.getListFile() != null) {
+            Alert confirmDeleteAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmDeleteAlert.setTitle("Delete List");
+            confirmDeleteAlert.setHeaderText(null);
+            confirmDeleteAlert.getDialogPane().setContent(new Label("Are you sure you want to delete this list?\n" +
+                    "(This action cannot be undone)"));
+            ((Label) confirmDeleteAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
+            confirmDeleteAlert.initOwner(stage);
+            confirmDeleteAlert.showAndWait().ifPresent(response -> {
+                if(response == ButtonType.OK) {
+                    if (!dao.delete()) {
+                        Alert deleteFailedAlert = new Alert(Alert.AlertType.ERROR);
+                        deleteFailedAlert.setTitle("Delete Failed");
+                        deleteFailedAlert.setHeaderText(null);
+                        deleteFailedAlert.getDialogPane().setContent(new Label("Unknown Error: Failed to Delete List"));
+                        ((Label) deleteFailedAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
+                        deleteFailedAlert.initOwner(stage);
+                        deleteFailedAlert.show();
+                    } else {
+                        itemListView.getItems().clear();
+                    }
+                }
+            });
         } else {
-            itemListView.getItems().clear();
+            Alert noListAlert = new Alert(Alert.AlertType.WARNING);
+            noListAlert.setTitle("Delete Failed");
+            noListAlert.setHeaderText(null);
+            noListAlert.getDialogPane().setContent(new Label("No List to Delete!"));
+            ((Label) noListAlert.getDialogPane().getContent()).setTextAlignment(TextAlignment.CENTER);
+            noListAlert.initOwner(stage);
+            noListAlert.show();
         }
     }
 
     @FXML
     void exit(ActionEvent event) {
+        // TODO warn unsaved
         Platform.exit();
     }
 
