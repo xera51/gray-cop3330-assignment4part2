@@ -11,11 +11,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import java.net.URL;
 
 // TODO make icon a variable so other windows can access
+// TODO load icon without getClassLoader
 public class ToDoListManager extends Application {
 
     public static URL TaskCellFXML;

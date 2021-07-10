@@ -136,8 +136,8 @@
             </MenuButton>
             <MenuButton mnemonicParsing="false" prefHeight="26.0" text="Sort">
               <items>
-                <MenuItem mnemonicParsing="false" text="Alphabetically" />
-                <MenuItem mnemonicParsing="false" text="Due Date" />
+                <MenuItem fx:id="sortAlphabeticallyItem" mnemonicParsing="false" onAction="#sortAlphabetically" text="Alphabetically" />
+                <MenuItem fx:id="sortDueDateItem" mnemonicParsing="false" onAction="#sortByDueDate" text="Due Date" />
               </items>
             </MenuButton>
             <Button fx:id="addButton" mnemonicParsing="false" onAction="#addItem" text="+" />

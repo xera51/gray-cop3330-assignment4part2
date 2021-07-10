@@ -38,6 +38,7 @@ import java.util.Random;
 // TODO make it so when checkbox clicked, the cell is selected
 // TODO move alerts somewhere else
 // TODO not saved alerts
+// TODO sorts called after edits (and add and remove)
 public class ToDoListManagerController {
 
     ToDoDAO dao = new ToDoDAO();
@@ -75,6 +76,12 @@ public class ToDoListManagerController {
 
     @FXML
     private MenuItem showIncompleteItem;
+
+    @FXML
+    private MenuItem sortAlphabeticallyItem;
+
+    @FXML
+    private MenuItem sortDueDateItem;
 
 
     ToDoListManagerController(Stage stage) {
@@ -383,6 +390,16 @@ public class ToDoListManagerController {
     @FXML
     void showIncompleteToDos(ActionEvent event) {
         model.filterIncomplete();
+    }
+
+    @FXML
+    void sortAlphabetically(ActionEvent event) {
+        model.sortLexogrphaic();
+    }
+
+    @FXML
+    void sortByDueDate(ActionEvent event) {
+        model.sortDue();
     }
 
     // If the directory for the file/directory chooser was deleted, sets directory to ./lists
