@@ -36,7 +36,11 @@ public class TaskCellController {
     @FXML
     private Label descriptionLabel;
 
-    public void setToDo(ToDo toDo) {
+    ToDo toDo;
+
+    public void setToDo(ToDo newToDo) {
+
+        toDo = newToDo;
 
         StringBinding dueDateBinding = new StringBinding() {
             {
