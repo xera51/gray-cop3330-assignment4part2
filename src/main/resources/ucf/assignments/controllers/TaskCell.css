@@ -1,0 +1,35 @@
+.label {
+    -fx-font-weight: 400;
+    -fx-padding: 6;
+}
+
+
+#descriptionLabel {
+    -fx-font-size: 20;
+}
+
+#dueDateLabel {
+    -fx-text-fill: "lightslategray";
+    -fx-font-size: 12;
+}
+
+#completeCheckBox .box{
+    -fx-padding: 6px;
+    -fx-background-radius: 10px;
+    -fx-background-color: "white";
+    -fx-border-color: "gray";
+    -fx-border-radius: 10px;
+}
+
+#completeCheckBox:selected .box {
+    -fx-background-radius: 10px;
+    -fx-background-color: "royalblue";
+}
+
+#completeCheckBox:selected .mark {
+    -fx-background-color: "white";
+}
+
+.borderpane {
+    -fx-padding: 6;
+}

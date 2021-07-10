@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
@@ -12,7 +11,6 @@
 <?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -81,37 +79,7 @@
         </menus>
       </MenuBar>
    </top>
-   <left>
-      <BorderPane prefHeight="200.0" prefWidth="300.0" styleClass="borderpane" BorderPane.alignment="CENTER">
-         <top>
-            <HBox alignment="BOTTOM_CENTER" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <children>
-                  <MenuButton mnemonicParsing="false" prefHeight="26.0" text="Show">
-                    <items>
-                        <RadioMenuItem mnemonicParsing="false" text="Incomplete" />
-                        <RadioMenuItem mnemonicParsing="false" text="Complete" />
-                    </items>
-                  </MenuButton>
-                  <MenuButton mnemonicParsing="false" prefHeight="26.0" text="Sort">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Alphabetically" />
-                      <MenuItem mnemonicParsing="false" text="Due Date" />
-                    </items>
-                  </MenuButton>
-                  <Button fx:id="addButton" mnemonicParsing="false" onAction="#addItem" text="+" />
-                  <Button mnemonicParsing="false" text="-" />
-               </children>
-               <BorderPane.margin>
-                  <Insets top="6.0" />
-               </BorderPane.margin>
-            </HBox>
-         </top>
-         <center>
-            <ListView fx:id="itemListView" BorderPane.alignment="CENTER" />
-         </center>
-      </BorderPane>
-   </left>
-   <center>
+   <right>
       <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <bottom>
             <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -122,15 +90,11 @@
          </bottom>
          <center>
             <BorderPane prefHeight="200.0" prefWidth="200.0" styleClass="borderpane" BorderPane.alignment="CENTER">
-               <bottom>
-                  <CheckBox fx:id="completeCheckbox" mnemonicParsing="false" onAction="#toggleComplete" text="Complete?" BorderPane.alignment="CENTER" />
-               </bottom>
                <top>
                   <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                      <children>
                         <Label fx:id="dueLabel" text="Due" />
-                        <TextField fx:id="dueDateField" onInputMethodTextChanged="#dueEdited" prefHeight="26.0" prefWidth="159.0" />
-                        <Button fx:id="editDueButton" mnemonicParsing="false" onAction="#editDue" />
+                        <DatePicker fx:id="dueDateField" disable="true" />
                      </children>
                   </HBox>
                </top>
@@ -153,5 +117,32 @@
             <VBox prefHeight="100.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
          </top>
       </BorderPane>
+   </right>
+   <center>
+      <BorderPane prefHeight="200.0" prefWidth="300.0" styleClass="borderpane" BorderPane.alignment="CENTER">
+         <center>
+            <ListView fx:id="itemListView" prefHeight="0.0" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
    </center>
+   <left>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <MenuButton mnemonicParsing="false" prefHeight="26.0" text="Show">
+              <items>
+                  <RadioMenuItem mnemonicParsing="false" text="Incomplete" />
+                  <RadioMenuItem mnemonicParsing="false" text="Complete" />
+              </items>
+            </MenuButton>
+            <MenuButton mnemonicParsing="false" prefHeight="26.0" text="Sort">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Alphabetically" />
+                <MenuItem mnemonicParsing="false" text="Due Date" />
+              </items>
+            </MenuButton>
+            <Button fx:id="addButton" mnemonicParsing="false" onAction="#addItem" text="+" />
+            <Button mnemonicParsing="false" text="-" />
+         </children>
+      </VBox>
+   </left>
 </BorderPane>

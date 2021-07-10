@@ -1,4 +1,30 @@
 .borderpane {
     -fx-padding: 6;
-    /*-fx-background-color: darkgrey;*/
+}
+
+.list-view {
+    -fx-background-insets: 0;
+    -fx-background-color: 'transparent';
+}
+
+.list-cell {
+    -fx-padding: 4, 2, 2, 2;
+    -fx-background-color: 'transparent';
+}
+
+.list-cell:empty {
+    -fx-background-color: 'transparent';
+}
+
+.list-cell:selected {
+    -fx-background-color: "lightblue";
+
+}
+
+.list-cell:selected .text {
+    -fx-fill: "black";
+}
+
+.list-cell:filled {
+
 }

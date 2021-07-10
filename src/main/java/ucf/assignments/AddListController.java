@@ -19,8 +19,6 @@ public class AddListController {
 
     @FXML private Button cancelButton;
 
-    private ToDoList list;
-
 
     @FXML
     void confirm(ActionEvent event) {

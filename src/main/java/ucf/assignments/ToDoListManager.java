@@ -11,22 +11,24 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
-import java.time.LocalDate;
+import java.net.URL;
 
 // TODO make icon a variable so other windows can access
 public class ToDoListManager extends Application {
 
+    public static URL TaskCellFXML;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("ToDoListManager.fxml"));
+        TaskCellFXML = getClass().getResource("/ucf/assignments/controllers/TaskCell.fxml");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("ToDoListManager.fxml"));
+        Parent root = loader.load();
         Scene scene = new Scene(root);
 
         primaryStage.setTitle("To-Do List Manager");
         primaryStage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("Icon.png")));
         primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
         primaryStage.show();
 
     }

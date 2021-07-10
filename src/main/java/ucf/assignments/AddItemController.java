@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import ucf.assignments.model.ToDo;
 
 public class AddItemController {
 
@@ -20,7 +21,7 @@ public class AddItemController {
     @FXML private Button submitButton;
     @FXML private Button cancelButton;
 
-    private Item item;
+    private ToDo todo;
 
     @FXML
     private void submit(ActionEvent event) {
@@ -28,7 +29,7 @@ public class AddItemController {
         // get date from date
         // validate
         // if not valid, alert user and abort method
-        // create new item
+        // create new todo
         // close window
     }
 
