@@ -1,0 +1,17 @@
+[
+  {
+    "description": "Complete COP3330 Assignment",
+    "dueDate": "2021-07-11",
+    "complete": true
+  },
+  {
+    "description": "Do This Important Thing",
+    "dueDate": "2021-07-16",
+    "complete": false
+  },
+  {
+    "description": "Finish Project",
+    "dueDate": "2021-07-21",
+    "complete": false
+  }
+]
