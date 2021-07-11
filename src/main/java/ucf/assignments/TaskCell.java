@@ -19,7 +19,6 @@ public class TaskCell extends ListCell<ToDo> {
             FXMLLoader loader = new FXMLLoader(ToDoListManager.TaskCellFXML);
             loader.load();
             controller = loader.getController();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -30,8 +29,7 @@ public class TaskCell extends ListCell<ToDo> {
         super.updateItem(todo, empty);
         if(empty || todo == null) {
             setGraphic(null);
-        }
-        else {
+        } else {
             controller.setToDo(todo);
             Node root = controller.getView();
             setGraphic(root);

@@ -68,11 +68,14 @@
                 <MenuItem mnemonicParsing="false" onAction="#showAllToDos" text="Show All Items" />
                   <MenuItem mnemonicParsing="false" onAction="#showIncompleteToDos" text="Show Incomplete Items" />
                   <MenuItem mnemonicParsing="false" onAction="#showCompleteToDos" text="Show Complete Items" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#sortAlphabetically" text="Sort Alphabetically " />
+                  <MenuItem mnemonicParsing="false" onAction="#sortByDueDate" text="Sort by Due Date" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="_Help">
             <items>
-              <MenuItem mnemonicParsing="false" text="Getting Started" />
+              <MenuItem mnemonicParsing="false" onAction="#openHelpWindow" text="Getting Started" />
             </items>
           </Menu>
         </menus>
@@ -80,13 +83,6 @@
    </top>
    <right>
       <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <bottom>
-            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Button fx:id="deleteItemButton" mnemonicParsing="false" onAction="#deleteItem" text="Delete Item" />
-               </children>
-            </HBox>
-         </bottom>
          <center>
             <BorderPane prefHeight="200.0" prefWidth="200.0" styleClass="borderpane" BorderPane.alignment="CENTER">
                <top>
@@ -140,8 +136,9 @@
                 <MenuItem fx:id="sortDueDateItem" mnemonicParsing="false" onAction="#sortByDueDate" text="Due Date" />
               </items>
             </MenuButton>
-            <Button fx:id="addButton" mnemonicParsing="false" onAction="#addItem" text="+" />
-            <Button mnemonicParsing="false" text="-" />
+            <Button fx:id="addButton" mnemonicParsing="false" onAction="#addItem" text="Add To-Do" />
+            <Button fx:id="deleteToDoButton" mnemonicParsing="false" onAction="#deleteItem" text="Delete To-Do" />
+            <Button fx:id="deleteAllToDosButton" mnemonicParsing="false" onAction="#deleteAllItems" text="Delete All" />
          </children>
       </VBox>
    </left>

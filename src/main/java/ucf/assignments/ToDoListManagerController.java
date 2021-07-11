@@ -13,11 +13,9 @@ import javafx.beans.binding.StringBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -33,12 +31,13 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.InvalidPathException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Random;
 
 // TODO make it so when checkbox clicked, the cell is selected
 // TODO move alerts somewhere else
 // TODO not saved alerts
 // TODO sorts called after edits (and add and remove)
+// TODO include a sample list
+// TODO load last list opened when last closed? settings?
 public class ToDoListManagerController {
 
     ToDoDAO dao = new ToDoDAO();
@@ -68,6 +67,11 @@ public class ToDoListManagerController {
     @FXML private Button editListButton;
     @FXML private Button deleteListButton;
     @FXML private TextArea descriptionField;
+    @FXML
+    private Button deleteToDoButton;
+
+    @FXML
+    private Button deleteAllToDosButton;
     @FXML
     private MenuItem showAllItem;
 
@@ -242,7 +246,6 @@ public class ToDoListManagerController {
                 try {
                     defaultDir = selectedDirectory;
                     model.createList(selectedDirectory, fileName);
-                    model.loadList();
                 } catch (FileAlreadyExistsException e) {
                     PopUps.getListAlreadyExistsPopUp(stage).show();
                 } catch (IOException | InvalidPathException e) {
@@ -322,6 +325,12 @@ public class ToDoListManagerController {
         }
     }
 
+
+    @FXML
+    void openHelpWindow(ActionEvent event) {
+        PopUps.getHelpPopUp(stage).show();
+    }
+
     @FXML
     void exit(ActionEvent event) {
         // TODO warn unsaved
@@ -331,17 +340,17 @@ public class ToDoListManagerController {
 
     @FXML
     void addItem(ActionEvent event) {
-
+        PopUps.getAddToDoPopUp(stage).showAndWait().ifPresent(toDo -> model.addToDo(toDo));
     }
 
     @FXML
     void deleteItem(ActionEvent event) {
-
+       model.deleteToDo(itemListView.getSelectionModel().getSelectedItem());
     }
 
     @FXML
     void deleteAllItems(ActionEvent event) {
-
+        model.deleteAllToDos();
     }
 
     @FXML
@@ -362,19 +371,11 @@ public class ToDoListManagerController {
         }
     }
 
-    @FXML
-    void dueEdited(InputMethodEvent event) {
-
-    }
 
     @FXML
     void editDesc(ActionEvent event) {
-
-    }
-
-    @FXML
-    void editDue(ActionEvent event) {
-
+        descriptionField.requestFocus();
+        descriptionField.selectAll();
     }
 
     @FXML
@@ -394,7 +395,7 @@ public class ToDoListManagerController {
 
     @FXML
     void sortAlphabetically(ActionEvent event) {
-        model.sortLexogrphaic();
+        model.sortLexicographic();
     }
 
     @FXML

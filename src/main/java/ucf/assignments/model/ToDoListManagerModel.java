@@ -35,7 +35,7 @@ public class ToDoListManagerModel {
         filteredToDoList.setPredicate(toDo -> !toDo.isComplete());
     }
 
-    public void sortLexogrphaic() {
+    public void sortLexicographic() {
         toDoList.sort(ToDo::compareTo);
     }
 
@@ -67,6 +67,18 @@ public class ToDoListManagerModel {
 
     public void clearList() {
         dao.setListFileToNull();
+        toDoList.clear();
+    }
+
+    public void addToDo(ToDo toDo) {
+        toDoList.add(toDo);
+    }
+
+    public void deleteToDo(ToDo toDo) {
+        toDoList.remove(toDo);
+    }
+
+    public void deleteAllToDos() {
         toDoList.clear();
     }
 
