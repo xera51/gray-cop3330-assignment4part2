@@ -3,7 +3,7 @@
  *  Copyright 2021 Christopher Gray
  */
 
-package ucf.assignments;
+package ucf.assignments.controllers;
 
 import com.google.gson.JsonSyntaxException;
 import javafx.application.Platform;
@@ -21,6 +21,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import ucf.assignments.PopUps;
+import ucf.assignments.TaskCell;
 import ucf.assignments.model.ToDo;
 import ucf.assignments.model.ToDoDAO;
 import ucf.assignments.model.ToDoListManagerModel;
@@ -88,7 +90,7 @@ public class ToDoListManagerController {
     private MenuItem sortDueDateItem;
 
 
-    ToDoListManagerController(Stage stage) {
+    public ToDoListManagerController(Stage stage) {
         this.stage = stage;
     }
 
