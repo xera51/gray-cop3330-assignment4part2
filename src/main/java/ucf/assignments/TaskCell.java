@@ -16,7 +16,7 @@ public class TaskCell extends ListCell<ToDo> {
 
     public TaskCell() {
         try {
-            FXMLLoader loader = new FXMLLoader(ToDoListManager.TaskCellFXML);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ucf/assignments/fxml/TaskCell.fxml"));
             loader.load();
             controller = loader.getController();
         } catch (IOException e) {

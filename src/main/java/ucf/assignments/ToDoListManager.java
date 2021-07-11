@@ -12,30 +12,30 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.net.URL;
+import java.io.InputStream;
 
-// TODO make icon a variable so other windows can access
-// TODO load icon without getClassLoader
 public class ToDoListManager extends Application {
 
-    public static URL TaskCellFXML;
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        TaskCellFXML = getClass().getResource("/ucf/assignments/controllers/TaskCell.fxml");
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("ToDoListManager.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ucf/assignments/fxml/ToDoListManager.fxml"));
         loader.setControllerFactory(param -> new ToDoListManagerController(primaryStage));
         Parent root = loader.load();
         Scene scene = new Scene(root);
 
         primaryStage.setTitle("To-Do List Manager");
-        primaryStage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("Icon.png")));
+
+        try (InputStream icon = this.getClass().getResourceAsStream("/ucf/assignments/images/Icon.png")) {
+            assert icon != null;
+            primaryStage.getIcons().add(new Image(icon));
+        } catch (AssertionError ignored) {
+        }
+
         primaryStage.setScene(scene);
         primaryStage.show();
-
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }
