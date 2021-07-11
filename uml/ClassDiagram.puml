@@ -5,14 +5,14 @@ skinparam groupInheritance 3
 package ucf.assignments {
 
     package model {
-        class Todo implements java.io.Serializable, java.lang.Comparable{
+        class ToDo implements java.io.Serializable, java.lang.Comparable {
             - description : StringProperty
             - dueDate : ObjectProperty<LocalDate>
             - complete : BooleanProperty
 
-            + Todo(): Todo
-            + Todo(String description, LocalDate dueDate): Todo
-            + Todo(String description, LocalDate dueDate, boolean complete): Todo
+            + ToDo(): ToDo
+            + ToDo(String description, LocalDate dueDate): ToDo
+            + ToDo(String description, LocalDate dueDate, boolean complete): ToDo
 
             + getDesc(): String
             + setDesc(String description): void
@@ -27,22 +27,74 @@ package ucf.assignments {
             + toString(): String
             + equals(Object obj): int
             + hashCode(): int
-            + compareTo(Todo todo): int
+            + compareTo(ToDo todo): int
         }
 
-        class ToDoDAO {
+        class ToDoListDAO {
             - listFile : File
 
-            + ToDoDAO(): ToDoDAO
+            + ToDoListDAO(): ToDoListDAO
 
             + getListFile(): File
             + setListFileToNull(): void
 
             + create(File dir, String fileName): void
-            + open(File file): void
+            + open(File file): boolean
             + read(): Collection<? extends ToDo>
             + save(Collection<? extends ToDo> toDoList): boolean
             + delete(): boolean
+        }
+
+        class ToDoListManagerModel {
+            - toDoList : ObservableList<ToDo>
+            - filteredToDoList : FilteredList<ToDo>
+            - dao : ToDoListDAO
+
+            + ToDoListManagerModel(): ToDoListManagerModel
+
+            + getDAO(): ToDoListDAO
+            + getFilteredToDoList(): FilteredList<ToDo>
+
+            + filterAll(): void
+            + filterComplete(): void
+            + filterIncomplete(): void
+            + sortLexicographic(): void
+            + sortDue(): void
+
+            + createList(File dir, String fileName): void
+            + openList(File file): boolean
+            + loadList(): void
+            + saveList(): boolean
+            + deleteList(): boolean
+            + clearList(): void
+
+            + addToDo(ToDo toDo): void
+            + deleteToDo(ToDo toDo): void
+            + deleteAllToDo(): void
+        }
+    }
+
+    package factories {
+
+        class PopUps {
+            + {static} getNewListPopUp(Stage owner) : Dialog<String>
+            + {static} getListAlreadyExistsPopUp(Stage owner) : Dialog<ButtonType>
+            + {static} getListCreationFailedPopUp(Stage owner) : Dialog<ButtonType>
+            + {static} getSaveConfirmationPopUp(Stage owner) : Dialog<ButtonType>
+            + {static} getInvalidJsonFilePopUp(Stage owner) : Dialog<ButtonType>
+            + {static} getSaveFailedPopUp(Stage owner) : Dialog<ButtonType>
+            + {static} getDeleteConfirmationPopUp(Stage owner) : Dialog<ButtonType>
+            + {static} getDeleteFailedPopUp(Stage owner) : Dialog<ButtonType>
+            + {static} getWrongFileTypePopUp(Stage owner) : Dialog<ButtonType>
+            + {static} getAddToDoPopUp(Stage owner) : Dialog<ToDo>
+            + {static} getHelpPopUp(Stage owner) : Dialog<Void>
+        }
+
+        class TaskCell {
+            - controller : TaskCellController
+
+            + TaskCell(): TaskCell
+            # updateItem(ToDo todo, boolean empty): void
         }
     }
 
@@ -87,13 +139,78 @@ package ucf.assignments {
             JsonDeserializationContext context): BooleanProperty
         }
 
-        ToDoDAO .> ToDoListSerializer : «uses» >
+        ToDoListDAO .> ToDoListSerializer : «uses» >
         ToDoListSerializer +- StringPropertySerializer
         ToDoListSerializer +-- LocalDatePropertySerializer
         ToDoListSerializer +--- BooleanPropertySerializer
         ToDoListSerializer +--- StringPropertyDeserializer
         ToDoListSerializer +-- LocalDatePropertyDeserializer
         ToDoListSerializer +- BooleanPropertyDeserializer
+    }
+
+    package controllers {
+
+        class TaskCellController {
+            - root : BorderPane
+            - completeCheckBox : CheckBox
+            - dueDateLabel : Label
+            - descriptionLabel : Label
+            - toDo : ToDo
+
+            + setToDo(ToDo newToDo): void
+            + getView(): Node
+        }
+
+        class ToDoListManagerController {
+            - fileChooser : FileChooser
+            - directoryChooser : DirectoryChooser
+            - model : ToDoListManagerModel
+            - stage : Stage
+            - defaultDir : File
+            - descriptionPreviousSelection : IndexRange
+
+            - root : BorderPane
+            - menuBar : MenuBar
+            - newListMenuItem : MenuItem
+            - descriptionLabel : Label
+            - descriptionField : TextAre
+            - editDescButton : ButtonType
+            - dueLabel : Label
+            - dueDateField : DatePicker
+            - itemListView : ListView<ToDo>
+            - showAllItem : MenuItem
+            - showCompleteItem: MenuItem
+            - showIncompleteItem: MenuItem
+            - sortAlphabeticallyItem : MenuItem
+            - sortDUeDateItem : MenuItem
+            - addButton : Button
+            - deleteToDoButton : Button
+            - deleteAllToDoButton : Button
+
+            + ToDoListManagerController(Stage stage): ToDoListManagerController
+            + initialize(): void
+
+            ~ newList(ActionEvent event): void
+            ~ openList(ActionEvent event): void
+            ~ closeList(ActionEvent event): void
+            ~ save(ActionEvent event): void
+            ~ saveAs(ActionEvent event): void
+            ~ deleteList(ActionEvent event): void
+            ~ openHelpWindow(ActionEvent event): void
+            ~ exit(ActionEvent event): void
+            ~ addItem(ActionEvent event): void
+            ~ deleteItem(ActionEvent event): void
+            ~ deleteAllItems(ActionEvent event): void
+            ~ descFieldKeyPressed(KeyEvent event): void
+            ~ editDesc(ActionEvent event): void
+            ~ showAllToDo(ActionEvent event): void
+            ~ showCompleteToDo(ActionEvent event): void
+            ~ showInCompleteToDo(ActionEvent event): void
+            ~ sortAlphabetically(ActionEvent event): void
+            ~ sortByDueDate(ActionEvent event): void
+            - setChooserDir(): void
+            - makeListDir(): File
+        }
     }
 
 
@@ -133,8 +250,21 @@ ToDoListSerializer o-- com.google.gson.Gson
 
 package java.lang {
 
-    interface Comparable<Todo>{
-        + compareTo(Todo o): int
+    interface Comparable<ToDo>{
+        + compareTo(ToDo o): int
+    }
+}
+
+package javafx.scene.control {
+    class ListCell<ToDo> {
+        # updateItem(ToDo toDo, boolean empty): void
+    }
+}
+
+package javafx.application {
+    class Application {
+        + {static} launch(String[] args): void
+        + start(Stage primaryStage): void
     }
 }
 

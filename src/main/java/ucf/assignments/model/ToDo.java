@@ -29,7 +29,7 @@ public class ToDo implements Serializable, Comparable<ToDo> {
     public ToDo(String description, LocalDate dueDate, boolean complete) {
         this.description = new SimpleStringProperty(description);
         this.dueDate = new SimpleObjectProperty<>(dueDate);
-        this.complete = new SimpleBooleanProperty(false);
+        this.complete = new SimpleBooleanProperty(complete);
     }
 
     public static Callback<ToDo, Observable[]> extractor() {

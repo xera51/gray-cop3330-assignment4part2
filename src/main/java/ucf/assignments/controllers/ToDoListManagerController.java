@@ -21,10 +21,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import ucf.assignments.PopUps;
-import ucf.assignments.TaskCell;
+import ucf.assignments.factories.PopUps;
+import ucf.assignments.factories.TaskCell;
 import ucf.assignments.model.ToDo;
-import ucf.assignments.model.ToDoDAO;
 import ucf.assignments.model.ToDoListManagerModel;
 
 import java.io.File;
@@ -35,45 +34,45 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 // TODO make it so when checkbox clicked, the cell is selected
-// TODO move alerts somewhere else
-// TODO not saved alerts
+// TODO not saved alerts (You have unsaved changes. Would you like to continue?)
+// TODO when list is edited, mark list as not saved
 // TODO sorts called after edits (and add and remove)
-// TODO include a sample list
 // TODO load last list opened when last closed? settings?
 public class ToDoListManagerController {
 
-    ToDoDAO dao = new ToDoDAO();
-
-    ToDoListManagerModel model = new ToDoListManagerModel();
-
-    private File defaultDir = null;
     private final FileChooser fileChooser = new FileChooser();
     private final DirectoryChooser directoryChooser = new DirectoryChooser();
+    private final ToDoListManagerModel model = new ToDoListManagerModel();
+    private Stage stage;
+    private File defaultDir = null;
     private IndexRange descriptionPreviousSelection = new IndexRange(0, 0);
-    Stage stage;
-
-
-    @FXML private BorderPane root;
-    @FXML private MenuBar menuBar;
-    @FXML private MenuItem newListMenuItem;
-    @FXML private ListView<ToDo> itemListView;
-    @FXML private Button addButton;
-
-    @FXML private Button deleteItemButton;
-    @FXML private CheckBox completeCheckbox;
-    @FXML private Label dueLabel;
-    @FXML private DatePicker dueDateField;
-    @FXML private Label descriptionLabel;
-    @FXML private Button editDescButton;
-    @FXML private TextField listTitleField;
-    @FXML private Button editListButton;
-    @FXML private Button deleteListButton;
-    @FXML private TextArea descriptionField;
     @FXML
-    private Button deleteToDoButton;
+    private BorderPane root;
 
     @FXML
-    private Button deleteAllToDosButton;
+    private MenuBar menuBar;
+
+    @FXML
+    private MenuItem newListMenuItem;
+
+    @FXML
+    private Label descriptionLabel;
+
+    @FXML
+    private TextArea descriptionField;
+
+    @FXML
+    private Button editDescButton;
+
+    @FXML
+    private Label dueLabel;
+
+    @FXML
+    private DatePicker dueDateField;
+
+    @FXML
+    private ListView<ToDo> itemListView;
+
     @FXML
     private MenuItem showAllItem;
 
@@ -89,14 +88,21 @@ public class ToDoListManagerController {
     @FXML
     private MenuItem sortDueDateItem;
 
+    @FXML
+    private Button addButton;
+
+    @FXML
+    private Button deleteToDoButton;
+
+    @FXML
+    private Button deleteAllToDosButton;
+
 
     public ToDoListManagerController(Stage stage) {
         this.stage = stage;
     }
 
-    // TODO if alt-tabbing, remove the highlight for the
-    // menu bar so when you go back in it isnt on the menu bar
-    // (listener to stage/window showing, if not showing, remove menubar highlight
+    // TODO Unselected menuBar when Window is hidden
     public void initialize() {
 
         // Set up defaultDir
@@ -116,7 +122,7 @@ public class ToDoListManagerController {
         // Disables description and dueDate fields when no item selected
         itemListView.getSelectionModel().selectedIndexProperty().addListener(
                 (observable, oldValue, newValue) -> {
-                    if(itemListView.getSelectionModel().getSelectedIndex() < 0) {
+                    if (itemListView.getSelectionModel().getSelectedIndex() < 0) {
                         descriptionField.setDisable(true);
                         dueDateField.setDisable(true);
                     } else {
@@ -136,9 +142,9 @@ public class ToDoListManagerController {
                 Bindings.when(itemListView.getSelectionModel().selectedIndexProperty().lessThan(0))
                         .then("")
                         .otherwise(
-                Bindings.selectString(
-                        itemListView.getSelectionModel().selectedItemProperty(),
-                        "description"));
+                                Bindings.selectString(
+                                        itemListView.getSelectionModel().selectedItemProperty(),
+                                        "description"));
         descriptionField.textProperty().bind(descriptionBinding);
 
         // Allows user to type in descriptionField,
@@ -151,7 +157,7 @@ public class ToDoListManagerController {
                     descriptionField.textProperty().unbind();
                 } else {
                     // TODO maybe alert user cant be empty
-                    if((root.isFocused() || dueDateField.isFocused()) && descriptionField.getText().length() > 0)
+                    if ((root.isFocused() || dueDateField.isFocused()) && descriptionField.getText().length() > 0)
                         itemListView.getSelectionModel().getSelectedItem().setDesc(descriptionField.getText());
                     descriptionField.textProperty().bind(descriptionBinding);
                 }
@@ -159,7 +165,7 @@ public class ToDoListManagerController {
         });
 
         descriptionField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if(!event.isShiftDown() && event.getCode() == KeyCode.ENTER) {
+            if (!event.isShiftDown() && event.getCode() == KeyCode.ENTER) {
                 event.consume();
                 root.requestFocus();
             }
@@ -171,7 +177,7 @@ public class ToDoListManagerController {
             if (newLength > 256) {
                 // TODO alert user they tried to go above 256 chars maybe
                 String tail = change.getControlText().substring(change.getControlCaretPosition());
-                if(descriptionPreviousSelection.getLength() != 0 && descriptionPreviousSelection.getStart() == change.getControlCaretPosition()) {
+                if (descriptionPreviousSelection.getLength() != 0 && descriptionPreviousSelection.getStart() == change.getControlCaretPosition()) {
                     tail = tail.substring(descriptionPreviousSelection.getLength());
                 }
                 String head = newTextNoCarriageReturn.substring(0, 256 - tail.length());
@@ -188,16 +194,16 @@ public class ToDoListManagerController {
                 Bindings.when(itemListView.getSelectionModel().selectedIndexProperty().lessThan(0))
                         .then((LocalDate) null)
                         .otherwise(
-                Bindings.select(
-                        itemListView.getSelectionModel().selectedItemProperty(),
-                        "dueDate"));
+                                Bindings.select(
+                                        itemListView.getSelectionModel().selectedItemProperty(),
+                                        "dueDate"));
 
         dueDateField.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (itemListView.getSelectionModel().getSelectedIndex() >= 0) {
                 if (newValue) {
                     dueDateField.valueProperty().unbind();
                 } else {
-                    if(!itemListView.isFocused())
+                    if (!itemListView.isFocused())
                         itemListView.getSelectionModel().getSelectedItem().setDueDate(dueDateField.getValue());
                     dueDateField.valueProperty().bind(dueDateBinding);
                 }
@@ -232,7 +238,7 @@ public class ToDoListManagerController {
         });
 
         dueDateField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if(!event.isShiftDown() && event.getCode() == KeyCode.ENTER) {
+            if (!event.isShiftDown() && event.getCode() == KeyCode.ENTER) {
                 event.consume();
                 root.requestFocus();
             }
@@ -244,7 +250,7 @@ public class ToDoListManagerController {
         PopUps.getNewListPopUp(stage).showAndWait().ifPresent(fileName -> {
             setChooserDir();
             File selectedDirectory = directoryChooser.showDialog(stage);
-            if(selectedDirectory != null) {
+            if (selectedDirectory != null) {
                 try {
                     defaultDir = selectedDirectory;
                     model.createList(selectedDirectory, fileName);
@@ -264,7 +270,7 @@ public class ToDoListManagerController {
         fileChooser.setTitle("Open List");
         File selectedFile = fileChooser.showOpenDialog(stage);
 
-        if(selectedFile != null) {
+        if (selectedFile != null) {
             try {
                 defaultDir = selectedFile.getParentFile();
                 model.openList(selectedFile);
@@ -277,7 +283,7 @@ public class ToDoListManagerController {
 
     @FXML
     void closeList(ActionEvent event) {
-        if(model.getDao().getListFile() != null) {
+        if (model.getDao().getListFile() != null) {
             // TODO warn unsaved
             root.requestFocus();
             model.clearList();
@@ -287,9 +293,9 @@ public class ToDoListManagerController {
     @FXML
     void save(ActionEvent event) {
         // TODO set saved to true
-        if(model.getDao().getListFile() == null) {
+        if (model.getDao().getListFile() == null) {
             saveAs(event);
-        } else if(!model.saveList()) {
+        } else if (!model.saveList()) {
             PopUps.getSaveFailedPopUp(stage).show();
         }
     }
@@ -301,7 +307,7 @@ public class ToDoListManagerController {
         fileChooser.setTitle("Save As");
         File selectedFile = fileChooser.showSaveDialog(stage);
 
-        if(model.openList(selectedFile)) {
+        if (model.openList(selectedFile)) {
             if (model.saveList()) {
                 defaultDir = selectedFile.getParentFile();
             } else {
@@ -316,7 +322,7 @@ public class ToDoListManagerController {
     void deleteList(ActionEvent event) {
         if (model.getDao().getListFile() != null) {
             PopUps.getDeleteConfirmationPopUp(stage).showAndWait().ifPresent(response -> {
-                if(response == ButtonType.OK) {
+                if (response == ButtonType.OK) {
                     if (!model.deleteList()) {
                         PopUps.getDeleteFailedPopUp(stage).show();
                     }
@@ -347,7 +353,7 @@ public class ToDoListManagerController {
 
     @FXML
     void deleteItem(ActionEvent event) {
-       model.deleteToDo(itemListView.getSelectionModel().getSelectedItem());
+        model.deleteToDo(itemListView.getSelectionModel().getSelectedItem());
     }
 
     @FXML
@@ -357,9 +363,9 @@ public class ToDoListManagerController {
 
     @FXML
     void descFieldKeyPressed(KeyEvent event) {
-        if(itemListView.getSelectionModel().getSelectedIndex() >= 0) {
-            if(event.getCode() == KeyCode.ENTER) {
-                if(event.isShiftDown()) {
+        if (itemListView.getSelectionModel().getSelectedIndex() >= 0) {
+            if (event.getCode() == KeyCode.ENTER) {
+                if (event.isShiftDown()) {
                     descriptionField.insertText(descriptionField.getCaretPosition(), "\n");
                 } else {
                     event.consume();
@@ -407,7 +413,7 @@ public class ToDoListManagerController {
 
     // If the directory for the file/directory chooser was deleted, sets directory to ./lists
     private void setChooserDir() {
-        if(!fileChooser.getInitialDirectory().exists()) {
+        if (!fileChooser.getInitialDirectory().exists()) {
             fileChooser.setInitialDirectory(makeListsDir());
             directoryChooser.setInitialDirectory(fileChooser.getInitialDirectory());
         }
@@ -418,7 +424,7 @@ public class ToDoListManagerController {
     private File makeListsDir() {
         File listDir = new File(System.getProperty("user.dir") +
                 File.separator + "lists" + File.separator);
-        if(!listDir.exists()) listDir.mkdir();
+        if (!listDir.exists()) listDir.mkdir();
         return listDir;
     }
 }

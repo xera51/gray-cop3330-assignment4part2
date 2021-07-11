@@ -1,4 +1,9 @@
-package ucf.assignments;
+/*
+ *  UCF COP3330 Summer 2021 Assignment 4 Solution
+ *  Copyright 2021 Christopher Gray
+ */
+
+package ucf.assignments.factories;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -9,7 +14,6 @@ import ucf.assignments.model.ToDo;
 import java.io.IOException;
 import java.net.URL;
 
-// TODO customize cell
 public class TaskCell extends ListCell<ToDo> {
 
     private TaskCellController controller;

@@ -1,6 +1,10 @@
-package ucf.assignments;
+/*
+ *  UCF COP3330 Summer 2021 Assignment 4 Solution
+ *  Copyright 2021 Christopher Gray
+ */
 
-import javafx.event.EventHandler;
+package ucf.assignments.factories;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -8,14 +12,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 import ucf.assignments.model.ToDo;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 public class PopUps {
 

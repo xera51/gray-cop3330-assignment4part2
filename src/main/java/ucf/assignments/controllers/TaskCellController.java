@@ -1,3 +1,8 @@
+/*
+ *  UCF COP3330 Summer 2021 Assignment 4 Solution
+ *  Copyright 2021 Christopher Gray
+ */
+
 package ucf.assignments.controllers;
 
 import javafx.beans.binding.StringBinding;
@@ -25,7 +30,7 @@ public class TaskCellController {
     @FXML
     private Label descriptionLabel;
 
-    ToDo toDo;
+    private ToDo toDo;
 
     public void setToDo(ToDo newToDo) {
 

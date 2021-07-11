@@ -1,6 +1,10 @@
+/*
+ *  UCF COP3330 Summer 2021 Assignment 4 Solution
+ *  Copyright 2021 Christopher Gray
+ */
+
 package ucf.assignments.model;
 
-import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import ucf.assignments.util.ToDoListSerializer;
 
@@ -9,11 +13,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
 
-public class ToDoDAO {
+public class ToDoListDAO {
 
-    private File listFile;
+    private File listFile = null;
 
-    public ToDoDAO() { listFile = null; }
+    public ToDoListDAO() {}
 
     public File getListFile() {
         return listFile;
@@ -24,7 +28,7 @@ public class ToDoDAO {
     }
 
     /* Creates a new file using the dir as the directory and fileName as the file name
-     * If succeeds, this ToDoDAO's listFile is set
+     * If succeeds, this ToDoListDAO's listFile is set
      */
     public void create(File dir, String fileName)
             throws IOException {
@@ -32,7 +36,7 @@ public class ToDoDAO {
     }
 
     /* Opens a file
-     * If file ends with ".json", sets this ToDoDAO's listFile to passed file
+     * If file ends with ".json", sets this ToDoListDAO's listFile to passed file
      * otherwise, throws IllegalArgumentException
      */
     public boolean open(File file) {

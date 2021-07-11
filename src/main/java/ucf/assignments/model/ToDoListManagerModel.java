@@ -1,3 +1,8 @@
+/*
+ *  UCF COP3330 Summer 2021 Assignment 4 Solution
+ *  Copyright 2021 Christopher Gray
+ */
+
 package ucf.assignments.model;
 
 import com.google.gson.JsonSyntaxException;
@@ -13,9 +18,11 @@ public class ToDoListManagerModel {
 
     private final ObservableList<ToDo> toDoList = FXCollections.observableArrayList(ToDo.extractor());
     private final FilteredList<ToDo> filteredToDoList = new FilteredList<>(toDoList);
-    ToDoDAO dao = new ToDoDAO();
+    ToDoListDAO dao = new ToDoListDAO();
 
-    public ToDoDAO getDao() {
+    public ToDoListManagerModel() {}
+
+    public ToDoListDAO getDao() {
         return dao;
     }
 
