@@ -10,6 +10,8 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -32,6 +34,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.InvalidPathException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Consumer;
 
 // TODO make it so when checkbox clicked, the cell is selected
 // TODO not saved alerts (You have unsaved changes. Would you like to continue?)
@@ -46,6 +49,7 @@ public class ToDoListManagerController {
     private Stage stage;
     private File defaultDir = null;
     private IndexRange descriptionPreviousSelection = new IndexRange(0, 0);
+    private boolean saved = true;
     @FXML
     private BorderPane root;
 
@@ -125,9 +129,11 @@ public class ToDoListManagerController {
                     if (itemListView.getSelectionModel().getSelectedIndex() < 0) {
                         descriptionField.setDisable(true);
                         dueDateField.setDisable(true);
+                        deleteToDoButton.setDisable(true);
                     } else {
                         descriptionField.setDisable(false);
                         dueDateField.setDisable(false);
+                        deleteToDoButton.setDisable(false);
                     }
                 });
 
@@ -147,18 +153,19 @@ public class ToDoListManagerController {
                                         "description"));
         descriptionField.textProperty().bind(descriptionBinding);
 
-        // Allows user to type in descriptionField,
-        // When they leave the field, edits the current item's description
-        // unless they clicked on the listview
-        // TODO don't save if window is closed (when user clicks off) (this might lose the text)
+        // TODO don't save if window is closed (when user clicks off) (this will lose the text, fix that)
         descriptionField.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (itemListView.getSelectionModel().getSelectedIndex() >= 0) {
                 if (newValue) {
                     descriptionField.textProperty().unbind();
                 } else {
                     // TODO maybe alert user cant be empty
-                    if ((root.isFocused() || dueDateField.isFocused()) && descriptionField.getText().length() > 0)
+                    if ((root.isFocused() || dueDateField.isFocused()) && descriptionField.getText().length() > 0 &&
+                            !itemListView.getSelectionModel().getSelectedItem().getDesc().equals(descriptionField.getText())) {
                         itemListView.getSelectionModel().getSelectedItem().setDesc(descriptionField.getText());
+                        saved = false;
+                    }
+
                     descriptionField.textProperty().bind(descriptionBinding);
                 }
             }
@@ -203,8 +210,15 @@ public class ToDoListManagerController {
                 if (newValue) {
                     dueDateField.valueProperty().unbind();
                 } else {
-                    if (!itemListView.isFocused())
+                    if (!itemListView.isFocused() &&
+                            !itemListView.getSelectionModel()
+                            .getSelectedItem()
+                            .getDueDate()
+                            .isEqual(dueDateField.getValue())) {
                         itemListView.getSelectionModel().getSelectedItem().setDueDate(dueDateField.getValue());
+                        saved = false;
+                    }
+
                     dueDateField.valueProperty().bind(dueDateBinding);
                 }
             }
@@ -243,6 +257,10 @@ public class ToDoListManagerController {
                 root.requestFocus();
             }
         });
+
+        // Complete CheckBox
+        //itemListView.getSelectionModel().selectedItemProperty().addListener(
+                //(observable, oldValue, newValue) -> saved = false);
     }
 
     @FXML
@@ -265,18 +283,24 @@ public class ToDoListManagerController {
 
     @FXML
     void openList(ActionEvent event) {
-        // TODO warn unsaved
-        setChooserDir();
-        fileChooser.setTitle("Open List");
-        File selectedFile = fileChooser.showOpenDialog(stage);
+        if(!saved) {
+            PopUps.getSaveConfirmationPopUp(stage).showAndWait().ifPresent(buttonType -> {
+                if (buttonType == ButtonType.OK) saved = true;
+            });
+        }
+        if(saved) {
+            setChooserDir();
+            fileChooser.setTitle("Open List");
+            File selectedFile = fileChooser.showOpenDialog(stage);
 
-        if (selectedFile != null) {
-            try {
-                defaultDir = selectedFile.getParentFile();
-                model.openList(selectedFile);
-                model.loadList();
-            } catch (JsonSyntaxException e) {
-                PopUps.getInvalidJsonFilePopUp(stage).show();
+            if (selectedFile != null) {
+                try {
+                    defaultDir = selectedFile.getParentFile();
+                    model.openList(selectedFile);
+                    model.loadList();
+                } catch (JsonSyntaxException e) {
+                    PopUps.getInvalidJsonFilePopUp(stage).show();
+                }
             }
         }
     }
@@ -284,25 +308,31 @@ public class ToDoListManagerController {
     @FXML
     void closeList(ActionEvent event) {
         if (model.getDao().getListFile() != null) {
-            // TODO warn unsaved
-            root.requestFocus();
-            model.clearList();
+            if(!saved) {
+                PopUps.getSaveConfirmationPopUp(stage).showAndWait().ifPresent(buttonType -> {
+                    if (buttonType == ButtonType.OK) saved = true;
+                });
+            }
+            if(saved) {
+                root.requestFocus();
+                model.clearList();
+            }
         }
     }
 
     @FXML
     void save(ActionEvent event) {
-        // TODO set saved to true
         if (model.getDao().getListFile() == null) {
             saveAs(event);
-        } else if (!model.saveList()) {
+        } else if (model.saveList()) {
+            saved = true;
+        } else {
             PopUps.getSaveFailedPopUp(stage).show();
         }
     }
 
     @FXML
     void saveAs(ActionEvent event) {
-        // TODO set saved to true
         setChooserDir();
         fileChooser.setTitle("Save As");
         File selectedFile = fileChooser.showSaveDialog(stage);
@@ -310,6 +340,7 @@ public class ToDoListManagerController {
         if (model.openList(selectedFile)) {
             if (model.saveList()) {
                 defaultDir = selectedFile.getParentFile();
+                saved = true;
             } else {
                 PopUps.getSaveFailedPopUp(stage).show();
             }
@@ -341,24 +372,33 @@ public class ToDoListManagerController {
 
     @FXML
     void exit(ActionEvent event) {
-        // TODO warn unsaved
-        Platform.exit();
+        if(!saved) PopUps.getSaveConfirmationPopUp(stage).showAndWait().ifPresent(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                Platform.exit();
+            }
+        });
+        else Platform.exit();
     }
 
 
     @FXML
     void addItem(ActionEvent event) {
-        PopUps.getAddToDoPopUp(stage).showAndWait().ifPresent(model::addToDo);
+        PopUps.getAddToDoPopUp(stage).showAndWait().ifPresent(toDo -> {
+            model.addToDo(toDo);
+            saved = false;
+        });
     }
 
     @FXML
     void deleteItem(ActionEvent event) {
         model.deleteToDo(itemListView.getSelectionModel().getSelectedItem());
+        saved = false;
     }
 
     @FXML
     void deleteAllItems(ActionEvent event) {
         model.deleteAllToDos();
+        saved = false;
     }
 
     @FXML

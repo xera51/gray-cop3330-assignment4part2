@@ -92,7 +92,7 @@
                         <TextArea fx:id="descriptionField" disable="true" onKeyPressed="#descFieldKeyPressed" />
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <Button fx:id="editDescButton" mnemonicParsing="false" onAction="#editDesc" />
+                              <Button fx:id="editDescButton" text="Edit" mnemonicParsing="false" onAction="#editDesc" />
                            </children>
                         </HBox>
                      </children>

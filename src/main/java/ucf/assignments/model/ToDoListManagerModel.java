@@ -59,7 +59,8 @@ public class ToDoListManagerModel {
     }
 
     public void loadList() throws JsonSyntaxException {
-        toDoList.setAll(dao.read());
+        toDoList.clear();
+        toDoList.addAll(dao.read());
     }
 
     public boolean saveList() {
