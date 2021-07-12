@@ -175,7 +175,7 @@ public class ToDoListManagerController {
             String newTextNoCarriageReturn = change.getControlNewText().replaceAll("\\r", "");
             int newLength = newTextNoCarriageReturn.length();
             if (newLength > 256) {
-                // TODO alert user they tried to go above 256 chars maybe
+                // TODO alert user they tried to go above 256 chars
                 String tail = change.getControlText().substring(change.getControlCaretPosition());
                 if (descriptionPreviousSelection.getLength() != 0 && descriptionPreviousSelection.getStart() == change.getControlCaretPosition()) {
                     tail = tail.substring(descriptionPreviousSelection.getLength());
@@ -348,7 +348,7 @@ public class ToDoListManagerController {
 
     @FXML
     void addItem(ActionEvent event) {
-        PopUps.getAddToDoPopUp(stage).showAndWait().ifPresent(toDo -> model.addToDo(toDo));
+        PopUps.getAddToDoPopUp(stage).showAndWait().ifPresent(model::addToDo);
     }
 
     @FXML

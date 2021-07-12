@@ -56,8 +56,7 @@ public class TaskCellController {
         dueDateLabel.textProperty().bind(dueDateBinding);
         descriptionLabel.textProperty().bind(toDo.descriptionProperty());
         completeCheckBox.setSelected(toDo.isComplete());
-        completeCheckBox.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> toDo.setComplete(newValue));
+        toDo.completeProperty().bind(completeCheckBox.selectedProperty());
     }
 
     public Node getView() {

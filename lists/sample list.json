@@ -1,16 +1,16 @@
 [
   {
-    "description": "Complete COP3330 Assignment",
+    "description": "Complete COP3330 assignment",
     "dueDate": "2021-07-11",
     "complete": true
   },
   {
-    "description": "Do This Important Thing",
+    "description": "Charge phone",
     "dueDate": "2021-07-30",
     "complete": false
   },
   {
-    "description": "Finish Project",
+    "description": "Go to the store",
     "dueDate": "2021-07-21",
     "complete": false
   }
