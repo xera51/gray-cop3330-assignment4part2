@@ -1,0 +1,83 @@
+@startuml
+
+package ucf.assignments.model {
+    class ToDo implements java.io.Serializable, java.lang.Comparable {
+        - description : StringProperty
+        - dueDate : ObjectProperty<LocalDate>
+        - complete : BooleanProperty
+
+        + ToDo(): ToDo
+        + ToDo(String description, LocalDate dueDate): ToDo
+        + ToDo(String description, LocalDate dueDate, boolean complete): ToDo
+
+        + getDesc(): String
+        + setDesc(String description): void
+        + descriptionProperty(): StringProperty
+        + getDueDate(): LocalDate
+        + setDueDate(LocalDate dueDate): void
+        + dueDateProperty(): ObjectProperty<LocalDate>
+        + isComplete(): boolean
+        + setComplete(boolean complete): void
+        + completeProperty(): BooleanProperty
+
+        + toString(): String
+        + equals(Object obj): int
+        + hashCode(): int
+        + compareTo(ToDo todo): int
+    }
+
+    class ToDoListDAO {
+        - listFile : File
+
+        + ToDoListDAO(): ToDoListDAO
+
+        + getListFile(): File
+        + setListFileToNull(): void
+
+        + create(File dir, String fileName): void
+        + open(File file): boolean
+        + read(): Collection<? extends ToDo>
+        + save(Collection<? extends ToDo> toDoList): boolean
+        + delete(): boolean
+    }
+
+    class ToDoListManagerModel {
+        - toDoList : ObservableList<ToDo>
+        - filteredToDoList : FilteredList<ToDo>
+        - dao : ToDoListDAO
+
+        + ToDoListManagerModel(): ToDoListManagerModel
+
+        + getDAO(): ToDoListDAO
+        + getFilteredToDoList(): FilteredList<ToDo>
+
+        + filterAll(): void
+        + filterComplete(): void
+        + filterIncomplete(): void
+        + sortLexicographic(): void
+        + sortDue(): void
+
+        + createList(File dir, String fileName): void
+        + openList(File file): boolean
+        + loadList(): void
+        + saveList(): boolean
+        + deleteList(): boolean
+        + clearList(): void
+
+        + addToDo(ToDo toDo): void
+        + deleteToDo(ToDo toDo): void
+        + deleteAllToDo(): void
+    }
+
+    ToDoListManagerModel o- ToDoListDAO
+    ToDo -o ToDoListManagerModel
+}
+
+package java.lang {
+
+    interface Comparable<ToDo>{
+        + compareTo(ToDo o): int
+    }
+}
+
+@enduml

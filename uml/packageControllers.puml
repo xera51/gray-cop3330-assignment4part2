@@ -1,0 +1,68 @@
+@startuml
+
+package ucf.assignments.controllers {
+
+    class TaskCellController {
+        - root : BorderPane
+        - completeCheckBox : CheckBox
+        - dueDateLabel : Label
+        - descriptionLabel : Label
+        - toDo : ToDo
+
+        + setToDo(ToDo newToDo): void
+        + getView(): Node
+    }
+
+    class ToDoListManagerController {
+        - fileChooser : FileChooser
+        - directoryChooser : DirectoryChooser
+        - model : ToDoListManagerModel
+        - stage : Stage
+        - defaultDir : File
+        - descriptionPreviousSelection : IndexRange
+
+        - root : BorderPane
+        - menuBar : MenuBar
+        - newListMenuItem : MenuItem
+        - descriptionLabel : Label
+        - descriptionField : TextAre
+        - editDescButton : ButtonType
+        - dueLabel : Label
+        - dueDateField : DatePicker
+        - itemListView : ListView<ToDo>
+        - showAllItem : MenuItem
+        - showCompleteItem: MenuItem
+        - showIncompleteItem: MenuItem
+        - sortAlphabeticallyItem : MenuItem
+        - sortDUeDateItem : MenuItem
+        - addButton : Button
+        - deleteToDoButton : Button
+        - deleteAllToDoButton : Button
+
+        + ToDoListManagerController(Stage stage): ToDoListManagerController
+        + initialize(): void
+
+        ~ newList(ActionEvent event): void
+        ~ openList(ActionEvent event): void
+        ~ closeList(ActionEvent event): void
+        ~ save(ActionEvent event): void
+        ~ saveAs(ActionEvent event): void
+        ~ deleteList(ActionEvent event): void
+        ~ openHelpWindow(ActionEvent event): void
+        ~ exit(ActionEvent event): void
+        ~ addItem(ActionEvent event): void
+        ~ deleteItem(ActionEvent event): void
+        ~ deleteAllItems(ActionEvent event): void
+        ~ descFieldKeyPressed(KeyEvent event): void
+        ~ editDesc(ActionEvent event): void
+        ~ showAllToDo(ActionEvent event): void
+        ~ showCompleteToDo(ActionEvent event): void
+        ~ showInCompleteToDo(ActionEvent event): void
+        ~ sortAlphabetically(ActionEvent event): void
+        ~ sortByDueDate(ActionEvent event): void
+        - setChooserDir(): void
+        - makeListDir(): File
+    }
+}
+
+@enduml

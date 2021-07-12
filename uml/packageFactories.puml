@@ -1,0 +1,27 @@
+@startuml
+
+package ucf.assignments.factories {
+
+    class PopUps {
+        + {static} getNewListPopUp(Stage owner) : Dialog<String>
+        + {static} getListAlreadyExistsPopUp(Stage owner) : Dialog<ButtonType>
+        + {static} getListCreationFailedPopUp(Stage owner) : Dialog<ButtonType>
+        + {static} getSaveConfirmationPopUp(Stage owner) : Dialog<ButtonType>
+        + {static} getInvalidJsonFilePopUp(Stage owner) : Dialog<ButtonType>
+        + {static} getSaveFailedPopUp(Stage owner) : Dialog<ButtonType>
+        + {static} getDeleteConfirmationPopUp(Stage owner) : Dialog<ButtonType>
+        + {static} getDeleteFailedPopUp(Stage owner) : Dialog<ButtonType>
+        + {static} getWrongFileTypePopUp(Stage owner) : Dialog<ButtonType>
+        + {static} getAddToDoPopUp(Stage owner) : Dialog<ToDo>
+        + {static} getHelpPopUp(Stage owner) : Dialog<Void>
+    }
+
+    class TaskCell {
+        - controller : TaskCellController
+
+        + TaskCell(): TaskCell
+        # updateItem(ToDo todo, boolean empty): void
+    }
+}
+
+@enduml
