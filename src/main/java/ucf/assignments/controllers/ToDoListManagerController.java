@@ -259,8 +259,8 @@ public class ToDoListManagerController {
         });
 
         // Complete CheckBox
-        //itemListView.getSelectionModel().selectedItemProperty().addListener(
-                //(observable, oldValue, newValue) -> saved = false);
+        itemListView.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> saved = false);
     }
 
     @FXML
